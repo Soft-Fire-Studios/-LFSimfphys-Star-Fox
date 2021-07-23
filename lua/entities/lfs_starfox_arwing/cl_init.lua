@@ -137,20 +137,23 @@ function ENT:ExhaustFX()
 
 					local particle = emitter:Add(mat, vOffset )
 					if not particle then return end
+					local fracMain =  (self.fracMain /15 or 1)
 					local vUp = self:GetUp()
 					local vRight = self:GetRight()
-					local vDir = -self:GetForward() +(vUp *Sub)
-					-- local vDir = bone.Ang:Forward() +(vUp *Sub)
-
+					local vForward = -self:GetForward()
+					local vDir = vForward +(vUp *Sub)
+					local pitchChange = (vUp *(500 *fracMain)) *-Sub
+					
 					local size = 70 +(self.BoostAdd *0.4)
-					particle:SetVelocity(vDir * 1000 + self:GetVelocity() +(i == 2 && vRight *-350 *Side or Vector(0,0,0)))
+					local misc = self:GetVelocity() +(i == 2 && vRight *-350 *Side or Vector(0,0,0))
+					particle:SetVelocity(vDir *1000 +pitchChange +misc)
 					particle:SetLifeTime( 0 )
 					particle:SetDieTime( 0.15 )
 					particle:SetStartAlpha( 255 )
 					particle:SetEndAlpha( 0 )
 					particle:SetStartSize( size )
 					particle:SetEndSize( size )
-					particle:SetAngles( vDir:Angle() )
+					particle:SetAngles( vDir:Angle() *fracMain )
 					particle:SetColor(0,255,0)
 				end
 			end
@@ -193,6 +196,34 @@ function ENT:OnRemove()
 end
 
 function ENT:AnimFins()
+	local FT = FrameTime() * 10
+	-- local Pitch = self:GetRotPitch()
+	-- local Yaw = self:GetRotYaw()
+	-- local Roll = -self:GetRotRoll()
+	local RPM = self:GetRPM()
+	local MaxRPM = self:GetMaxRPM()
+
+	local leftTop = 4
+	local leftMiddle = 5
+	local leftBottom = 6
+	local rightTop = 9
+	local rightMiddle = 8
+	local rightBottom = 7
+
+	-- self.smPitch = self.smPitch and self.smPitch + (Pitch - self.smPitch) * FT or 0
+	-- self.smYaw = self.smYaw and self.smYaw + (Yaw - self.smYaw) * FT or 0
+	-- self.smRoll = self.smRoll and self.smRoll + (Roll - self.smRoll) * FT or 0
+
+	self.fracMain = (RPM /MaxRPM) *15
+	
+	self:ManipulateBoneAngles( leftMiddle, Angle(self.fracMain *0.5,0,0 ) )
+	self:ManipulateBoneAngles( rightMiddle, Angle(-self.fracMain *0.5,0,0 ) )
+	
+	self:ManipulateBoneAngles( leftTop, Angle( 0,0,-self.fracMain) )
+	self:ManipulateBoneAngles( leftBottom, Angle( 0,0,self.fracMain) )
+	
+	self:ManipulateBoneAngles( rightTop, Angle( 0,0,-self.fracMain) )
+	self:ManipulateBoneAngles( rightBottom, Angle( 0,0,self.fracMain) )
 end
 
 function ENT:AnimRotor()
