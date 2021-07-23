@@ -147,6 +147,8 @@ function ENT:ExhaustFX()
 					local size = 70 +(self.BoostAdd *0.4)
 					local misc = self:GetVelocity() +(i == 2 && vRight *-350 *Side or Vector(0,0,0))
 					particle:SetVelocity(vDir *1000 +pitchChange +misc)
+					particle:SetGravity(Vector(0,0,0))
+					particle:SetAirResistance(5)
 					particle:SetLifeTime( 0 )
 					particle:SetDieTime( 0.15 )
 					particle:SetStartAlpha( 255 )
@@ -176,12 +178,14 @@ end
 
 function ENT:EngineActiveChanged( bActive )
 	if bActive then
-		self.ENG = CreateSound( self, "LFS_SF_ARWING_ENGINE" )
+		self.ENG = CreateSound(self,"LFS_SF_ARWING_ENGINE")
 		self.ENG:PlayEx(0,0)
-		self.ENG2 = CreateSound( self, "LFS_SF_ARWING_ENGINE2" )
-		self.ENG2:PlayEx(0,0)
+		-- self.ENG2 = CreateSound(self,"LFS_SF_ARWING_ENGINE2")
+		-- self.ENG2:PlayEx(0,0)
 	else
-		self:SoundStop()
+		if self.ENG then
+			self.ENG:Stop()
+		end
 	end
 end
 

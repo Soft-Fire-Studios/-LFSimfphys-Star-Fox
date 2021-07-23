@@ -1,7 +1,7 @@
 ENT.Type            = "anim"
 DEFINE_BASECLASS( "lunasflightschool_basescript" )
 
-ENT.PrintName = "Arwing"
+ENT.PrintName = "Wolfen"
 ENT.Author = "Cpt. Hazama"
 ENT.Information = ""
 ENT.Category = "[LFS] Star Fox: Assault"
@@ -9,42 +9,36 @@ ENT.Category = "[LFS] Star Fox: Assault"
 ENT.Spawnable		= true
 ENT.AdminSpawnable  = false
 
-ENT.MDL = "models/cpthazama/starfox/vehicles/arwing.mdl"
+ENT.MDL = "models/cpthazama/starfox/vehicles/wolfen.mdl"
 
-ENT.AITEAM = 2
+ENT.AITEAM = 1
 
-ENT.Mass = 1000
-local inert = 200000
-ENT.Inertia = Vector(inert,inert,inert)
-ENT.Drag = -10
+ENT.Mass = 2000
+ENT.Inertia = Vector(400000,400000,400000)
+ENT.Drag = -1
 
 ENT.HideDriver = false
-ENT.SeatPos = Vector(0,0,210)
+ENT.SeatPos = Vector(50,0,32)
 ENT.SeatAng = Angle(0,-90,0)
 
 ENT.WheelMass 		= 	325 -- wheel mass is 1 when the landing gear is retracted
-ENT.WheelRadius 	= 	10
-ENT.WheelPos_L 		= 	Vector(-89.72,58.55,2)
-ENT.WheelPos_R 		= 	Vector(-89.72,-58.55,2)
-ENT.WheelPos_C   	= 	Vector(118.73,0,4)
+ENT.WheelRadius 	= 	50
+ENT.WheelPos_L 		= 	Vector(0,-120,-180)
+ENT.WheelPos_R 		= 	Vector(0,120,-180)
+ENT.WheelPos_C   	= 	Vector(150,0,-180)
 
 ENT.IdleRPM = 1
-ENT.MaxRPM = 3200
-ENT.LimitRPM = 4000
+ENT.MaxRPM = 3600
+ENT.LimitRPM = 4400
 
--- ENT.RotorPos = Vector(300.59,0,89.19)
--- ENT.WingPos = Vector(31.18,0,55.25)
--- ENT.ElevatorPos = Vector(-223.62,0,51.35)
--- ENT.RudderPos = Vector(-223.33,0,66.8)
+ENT.RotorPos = Vector(490,0,10)
+ENT.WingPos = Vector(-50,0,10)
+ENT.ElevatorPos = Vector(-270,0,10)
+ENT.RudderPos = Vector(-270,0,10)
 
-ENT.RotorPos = Vector(225,0,10)
-ENT.WingPos = Vector(100,0,10)
-ENT.ElevatorPos = Vector(-200,0,10)
-ENT.RudderPos = Vector(-200,0,10)
+ENT.MaxVelocity = 4400
 
-ENT.MaxVelocity = 4000
-
-ENT.MaxThrust = 45000
+ENT.MaxThrust = 50000
 
 ENT.MaxTurnPitch = 800
 ENT.MaxTurnYaw = 800
@@ -52,7 +46,7 @@ ENT.MaxTurnRoll = 300
 
 ENT.MaxPerfVelocity = 	1500 -- speed in which the plane will have its maximum turning potential
 
-ENT.MaxHealth = 800
+ENT.MaxHealth = 1000
 ENT.MaxShield = 500
 
 ENT.VerticalTakeoff = true
@@ -61,12 +55,8 @@ ENT.MaxThrustVtol = 10000
 
 ENT.MaxPrimaryAmmo = 10000
 
-ENT.Stability 	= 	0.8
-ENT.MaxStability 	= 	0.8
-
-function ENT:AddDataTables()
-	self:NetworkVar("Float",21,"ChargeT")
-end
+ENT.Stability 	= 	1
+ENT.MaxStability 	= 	1
 
 sound.Add({
 	name = "LFS_SF_ARWING_ENGINE",
