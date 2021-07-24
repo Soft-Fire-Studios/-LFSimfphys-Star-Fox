@@ -166,8 +166,11 @@ function ENT:ExhaustFX()
 end
 
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
+	local minPitch = 75
+	local pitch = math.Clamp(math.Clamp(minPitch + Pitch * 50, minPitch,255) + Doppler,0,255)
+	-- Entity(1):ChatPrint(pitch)
 	if self.ENG then
-		self.ENG:ChangePitch(  math.Clamp(math.Clamp(  50 + Pitch * 50, 50,255) + Doppler,0,255) )
+		self.ENG:ChangePitch(pitch)
 		self.ENG:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
 	end
 	-- if self.ENG2 then

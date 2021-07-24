@@ -9,6 +9,8 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 
 	local ent = ents.Create(ClassName)
 	ent:SetPos(tr.HitPos + tr.HitNormal * 420)
+	local ang = ply:EyeAngles()
+	ent:SetAngles(Angle(0,ang.y +180,0))
 	ent:Spawn()
 	ent:Activate()
 
