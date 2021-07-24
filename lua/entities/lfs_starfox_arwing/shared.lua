@@ -11,7 +11,7 @@ ENT.AdminSpawnable  = false
 
 ENT.MDL = "models/cpthazama/starfox/vehicles/arwing.mdl"
 
-ENT.AITEAM = 2
+ENT.AITEAM = 1
 
 ENT.Mass = 1000
 local inert = 200000
@@ -65,6 +65,7 @@ ENT.Stability 	= 	0.8
 ENT.MaxStability 	= 	0.8
 
 function ENT:AddDataTables()
+	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 	self:NetworkVar("Float",21,"ChargeT")
 end
 

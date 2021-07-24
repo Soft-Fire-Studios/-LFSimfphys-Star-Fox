@@ -1,0 +1,17 @@
+"UnlitGeneric"
+{
+	"$basetexture" "hud/starfox/vo_wolf"
+	"$nolod" 1
+	"$nomip" 1
+	"$ignorez" 1
+	"$translucent" 1
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedtexturevar" "$basetexture"
+			"animatedtextureframenumvar" "$frame"
+			"animatedtextureframerate" 10
+		}
+	}
+}

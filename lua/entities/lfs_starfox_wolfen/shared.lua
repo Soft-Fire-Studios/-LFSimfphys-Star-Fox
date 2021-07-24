@@ -1,7 +1,7 @@
 ENT.Type            = "anim"
 DEFINE_BASECLASS( "lunasflightschool_basescript" )
 
-ENT.PrintName = "Wolfen"
+ENT.PrintName = "Wolfen Mk. II"
 ENT.Author = "Cpt. Hazama"
 ENT.Information = ""
 ENT.Category = "[LFS] Star Fox: Assault"
@@ -11,7 +11,7 @@ ENT.AdminSpawnable  = false
 
 ENT.MDL = "models/cpthazama/starfox/vehicles/wolfen.mdl"
 
-ENT.AITEAM = 1
+ENT.AITEAM = 2
 
 ENT.Mass = 2000
 ENT.Inertia = Vector(400000,400000,400000)
@@ -57,6 +57,10 @@ ENT.MaxPrimaryAmmo = 10000
 
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	1
+
+function ENT:AddDataTables()
+	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
+end
 
 sound.Add({
 	name = "LFS_SF_ARWING_ENGINE",

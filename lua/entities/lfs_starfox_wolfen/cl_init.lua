@@ -2,8 +2,113 @@
 
 include("shared.lua")
 
+ENT.Lines = {}
+ENT.Lines["Wolf"] = {
+	"cpthazama/starfox/vo/wolf/Wolfgoing down.mp3",
+	"cpthazama/starfox/vo/wolf/WolfPlaytimes over.mp3",
+	"cpthazama/starfox/vo/wolf/Wolfis that all.mp3",
+	"cpthazama/starfox/vo/wolf/Wolfwhat the heck.mp3",
+	"cpthazama/starfox/vo/wolf/Wolfyoull be seeing your dad.mp3",
+	"cpthazama/starfox/vo/wolf/Wolfyoure not so tough.mp3",
+	"cpthazama/starfox/vo/wolf/WollfCant let you do that.mp3",
+	"cpthazama/starfox/vo/wolf/WollfDont get too cocky.mp3",
+	"cpthazama/starfox/vo/wolf/WolfPlaytimes over.mp3",
+	"cpthazama/starfox/vo/wolf/Wolfyoure good im better.mp3",
+}
+ENT.Lines["Andrew"] = {
+	"cpthazama/starfox/vo/andrew/Andrew Andross enemy.mp3",
+	"cpthazama/starfox/vo/andrew/AndrewIm not afraid.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewbow before the great andross.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewgive it up.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewscore one for andross.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewstick to the pond.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewwell make sure.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewyoull be sorry.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewyoure not welcome.mp3",
+}
+ENT.Lines["Leon"] = {
+	"cpthazama/starfox/vo/leon/LeonI think Ill torture you.mp3",
+	"cpthazama/starfox/vo/leon/LeonIll take care of you.mp3",
+	"cpthazama/starfox/vo/leon/Leonandross ordered us.mp3",
+	"cpthazama/starfox/vo/leon/Leonannoying bird.mp3",
+	"cpthazama/starfox/vo/leon/Leonclose but no cigar.mp3",
+	"cpthazama/starfox/vo/leon/Leonnew ships.mp3",
+	"cpthazama/starfox/vo/leon/Leonnot as bad as I thought.mp3",
+	"cpthazama/starfox/vo/leon/Leonnot yet.mp3",
+	"cpthazama/starfox/vo/leon/Leonshoot me down.mp3",
+}
+ENT.Lines["Pigma"] = {
+	"cpthazama/starfox/vo/pigma/PigmaIll do you fast.mp3",
+	"cpthazama/starfox/vo/pigma/PigmaIm gonna bust you up.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmacome on little man.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmadaddy screamed.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmapeppy long time.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmathat reward.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmatoo bad dads not here.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmatwo words.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmawere getting paid.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmayou cant beat me.mp3",
+}
+ENT.LinesDeath = {}
+ENT.LinesDeath["Wolf"] = {
+	"cpthazama/starfox/vo/wolf/Wolfno way.mp3",
+	"cpthazama/starfox/vo/wolf/WollfI cant lose.mp3"
+}
+ENT.LinesDeath["Andrew"] = {
+	"cpthazama/starfox/vo/andrew/Andrew aah.mp3",
+	"cpthazama/starfox/vo/andrew/Andrewuncle andross.mp3",
+}
+ENT.LinesDeath["Leon"] = {
+	"cpthazama/starfox/vo/leon/Leonthis cant be happening.mp3",
+	"cpthazama/starfox/vo/leon/Leontoo strong.mp3",
+}
+ENT.LinesDeath["Pigma"] = {
+	"cpthazama/starfox/vo/pigma/Pigmabeautiful reward.mp3",
+	"cpthazama/starfox/vo/pigma/Pigmathis cant be happening.mp3",
+}
+
+function ENT:PlayVOSound(ply)
+	local VO = self:GetNW2String("VO")
+	tbl = self.VO_DeathSound == true && self.LinesDeath[VO] or self.Lines[VO]
+	return VJ_PICK(tbl)
+end
+
+function ENT:DoVOSound()
+	for _,ply in RandomPairs(player.GetAll()) do
+		local plyTeam = ply:lfsGetAITeam()
+		local team = self:GetNW2Int("Team")
+		if self:GetAI() && team != plyTeam then
+			local vehicle = ply:lfsGetPlane()
+			if !IsValid(vehicle) then return end
+			self.SF_NextTalkT = self.SF_NextTalkT or CurTime() +math.Rand(5,60)
+			ply.SF_NextTalkT = ply.SF_NextTalkT or 0
+			ply.SF_TalkT = ply.SF_TalkT or 0
+			ply.SF_TalkTexture = ply.SF_TalkTexture or nil
+			if CurTime() > self.SF_NextTalkT && CurTime() > ply.SF_NextTalkT && math.random(1,100) < 30 then
+				local snd = self:PlayVOSound(ply,tbl)
+				local snddur = SoundDuration(snd)
+				ply:EmitSound(snd,110,100,1)
+				-- EmitSound(snd,ply:EyePos(),-2,CHAN_STATIC,1,90,0,100)
+				ply.SF_TalkTexture = Material("hud/starfox/vo_" .. self:GetNW2String("VO") .. ".vtf")
+				ply.SF_TalkT = CurTime() +snddur
+				ply.SF_NextTalkT = ply.SF_TalkT +math.Rand(2,4)
+				self.SF_NextTalkT = CurTime() +snddur +math.Rand(15,40)
+			end
+		end
+	end
+end
+
+function ENT:Think()
+	self:DoVOSound()
+	if !self.VO_DeathSound && self:GetHP() <= 0 then
+		self.VO_DeathSound = true
+		self.SF_NextTalkT = 0
+		self:DoVOSound()
+	end
+end
+
 function ENT:Initialize()
-	
+	self.VO_DeathSound = false
 end
 
 local mat = Material( "sprites/light_glow02_add" )

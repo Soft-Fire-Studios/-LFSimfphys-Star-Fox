@@ -17,11 +17,25 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 	return ent
 end
 
+function ENT:CreateAI()
+	local selectable = {"Wolf","Leon","Andrew","Pigma"}
+	for name,ent in RandomPairs(SF_AI_UNIQUE) do
+		if VJ_HasValue(selectable,name) && !IsValid(ent) then
+			SF_AI_UNIQUE[name] = self
+			self:SetNW2String("VO",name)
+			break
+		end
+	end
+end
+
+function ENT:RemoveAI()
+	local VO = self:GetNW2String("VO")
+	SF_AI_UNIQUE[VO] = NULL
+end
+
 function ENT:RunOnSpawn()
-	-- if FrameTime() > 0.067 then
-	-- 	self.ElevatorPos = Vector(-200,0,54.62)
-	-- 	self.RudderPos = Vector(-200,0,54.62)
-	-- end
+	self:SetNW2Entity("Enemy",NULL)
+	self:SetNW2String("VO",nil)
 end
 
 function ENT:OnRemove()
@@ -92,20 +106,7 @@ function ENT:SecondaryAttack()
 end
 
 function ENT:OnKeyThrottle( bPressed )
-	-- if bPressed && self.CanUseTrail && !IsValid(self.Trail) && self:GetRPM() > self:GetMaxRPM() *0.05 then
-	-- 	local size = 1000
-	-- 	self.Trail = util.SpriteTrail(self, 4, Color(192,153,255), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
-	-- else
-	-- 	if (self:GetRPM() + 1) > self:GetMaxRPM() then
-	-- 		SafeRemoveEntity(self.Trail)
-	-- 	end
-	-- end
-end
 
-function ENT:CreateAI()
-end
-
-function ENT:RemoveAI()
 end
 
 function ENT:ToggleLandingGear()
@@ -117,6 +118,11 @@ end
 function ENT:HandleWeapons(Fire1, Fire2)
 	local RPM = self:GetRPM()
 	local MaxRPM = self:GetMaxRPM()
+
+	if self:GetAI() then
+		self:SetNW2Entity("Enemy",self:AIGetTarget())
+		self:SetNW2Int("Team",self:GetAITEAM())
+	end
 
 	if RPM <= MaxRPM *0.05 then
 		SafeRemoveEntity(self.Trail)
