@@ -142,7 +142,7 @@ if SERVER then
 				if CurTime() - self.DefuseTime > 1 then
 					self:SetMasterSwitch( not self:GetMasterSwitch() )
 
-					for k, v in pairs( ents.FindByClass( "lfs_vehicle_spammer" ) ) do
+					for k, v in pairs( ents.FindByClass( "lfs_vehicle_spammer_better" ) ) do
 						if v ~= self and IsValid( v ) then
 							v:SetMasterSwitch( self:GetMasterSwitch() )
 						end
@@ -293,7 +293,7 @@ if CLIENT then
 
 	local TutorialDone = false
 
-	hook.Add( "HUDPaint", "!!!!!!!11111lfsvehiclespammer_tutorial", function()
+	hook.Add( "HUDPaint", "!!!!!!!11111lfsvehiclespammer_tutorial2", function()
 		if TutorialDone then return end
 
 		local ply = LocalPlayer()
@@ -309,7 +309,7 @@ if CLIENT then
 
 		if not IsValid( Ent ) then return end
 
-		if Ent:GetClass() == "lfs_vehicle_spammer" then
+		if Ent:GetClass() == "lfs_vehicle_spammer_better" then
 			local pos = Ent:GetPos()
 			local scr = pos:ToScreen()
 			local Alpha = 255

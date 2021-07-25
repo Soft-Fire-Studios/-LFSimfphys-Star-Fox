@@ -99,6 +99,16 @@ function ENT:DoVOSound()
 end
 
 function ENT:Think()
+	self:AnimCabin()
+	self:AnimLandingGear()
+	self:AnimRotor()
+	self:AnimFins()
+	
+	self:CheckEngineState()
+	
+	self:ExhaustFX()
+	self:DamageFX()
+
 	self:DoVOSound()
 	if !self.VO_DeathSound && self:GetHP() <= 0 then
 		self.VO_DeathSound = true

@@ -1,10 +1,10 @@
 ENT.Type            = "anim"
 DEFINE_BASECLASS( "lunasflightschool_basescript" )
 
-ENT.PrintName = "Arwing"
+ENT.PrintName = "Arwing Mk. II"
 ENT.Author = "Cpt. Hazama"
 ENT.Information = ""
-ENT.Category = "[LFS] Star Fox: Assault"
+ENT.Category = "[LFS] Star Fox"
 
 ENT.Spawnable		= true
 ENT.AdminSpawnable  = false

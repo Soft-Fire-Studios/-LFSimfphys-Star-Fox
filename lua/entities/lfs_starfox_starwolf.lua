@@ -7,7 +7,7 @@ ENT.Author 			= "Cpt. Hazama"
 ENT.Contact 		= ""
 ENT.Purpose 		= ""
 ENT.Instructions 	= ""
-ENT.Category 		= "[LFS] Star Fox: Assault"
+ENT.Category 		= "[LFS] Star Fox"
 
 ENT.Spawnable = true
 ENT.AdminOnly = true

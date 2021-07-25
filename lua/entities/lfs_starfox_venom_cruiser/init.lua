@@ -8,7 +8,7 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 	if not tr.Hit then return end
 
 	local ent = ents.Create(ClassName)
-	ent:SetPos(tr.HitPos + tr.HitNormal * 180)
+	ent:SetPos(tr.HitPos + tr.HitNormal * 1500)
 	local ang = ply:EyeAngles()
 	ent:SetAngles(Angle(0,ang.y +180,0))
 	ent:Spawn()
@@ -18,35 +18,64 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 end
 
 function ENT:RunOnSpawn()
-
+	local ramp = ents.Create("lfs_vehicle_spammer_better")
+	ramp:SetPos(self:LocalToWorld(Vector(500,0,1541)))
+	ramp:SetAngles(self:GetAngles() +Angle(0,90,0))
+	ramp:SetParent(self)
+	ramp:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	ramp:Spawn()
+	ramp:SetType("lfs_starfox_wolfen") -- Replace with Venom Fighters!
+	ramp:SetRespawnTime(10)
+	ramp:SetAmount(4)
+	ramp:SetMasterSwitch(true)
+	self:DeleteOnRemove(ramp)
 end
 
 function ENT:OnRemove()
-	SafeRemoveEntity(self.Trail)
+
 end
 
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:EmitSound("LFS_SF_ARWING_PRIMARY")
-	self:SetNextPrimary(0.25)
+	self:SetNextPrimary(0)
+
+	for i = 1, 12 do
+		self:FireTurret(i,self:GetAI() && IsValid(self.LastTarget) && self.LastTarget:GetPos() +self.LastTarget:OBBCenter())
+	end
+end
+
+function ENT:FireTurret(num,targetPos)
+	local hasAI = self:GetAI()
+	local EyeAngles = !hasAI && self:GetDriverSeat():WorldToLocalAngles(self:GetDriver():EyeAngles()) or nil
+	local startpos = self:GetAttachment(num).Pos
+	local trace = util.TraceHull({
+		start = startpos,
+		endpos = targetPos or (startpos +EyeAngles:Forward() *50000),
+		mins = Vector(-10,-10,-10),
+		maxs = Vector(10,10,10),
+		-- filter = self
+	})
+
+	if trace.Entity && trace.Entity == self then return end
 
 	local bullet = {}
 	bullet.Num 		= 1
-	bullet.Src 		= self:GetAttachment(1).Pos
-	bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
-	bullet.Spread 	= Vector(0.01,0.01,0)
+	bullet.Src 		= startpos
+	bullet.Dir 		= (trace.HitPos -startpos):GetNormalized()
+	bullet.Spread 	= Vector(0,0,0)
 	bullet.Tracer	= 1
-	bullet.TracerName = "lfs_laser_green"
+	bullet.TracerName = "lfs_sf_laser_venom"
 	bullet.Force	= 100
 	bullet.HullSize = 25
-	bullet.Damage	= 30
+	bullet.Damage	= 5
 	bullet.Attacker = self:GetDriver()
-	bullet.AmmoType = "Pistol"
+	bullet.AmmoType = "AR2"
 	bullet.Callback = function(att,tr,dmginfo)
 		dmginfo:SetDamageType(DMG_AIRBOAT)
-		-- sound.Play("cpthazama/starfox/vehicles/laser_hit.wav", tr.HitPos, 110, 100, 1)
+		sound.Play("ambient/energy/zap7.wav", tr.HitPos, 65, 150, 1)
 	end
+	sound.Play("ambient/energy/weld1.wav",startpos,75,80,1)
 	self:FireBullets(bullet)
 	self:TakePrimaryAmmo()
 end
@@ -63,43 +92,32 @@ end
 function ENT:RaiseLandingGear()
 end
 
-function ENT:HandleWeapons(Fire1, Fire2)
-	local RPM = self:GetRPM()
-	local MaxRPM = self:GetMaxRPM()
-
-	if RPM <= MaxRPM *0.05 then
-		SafeRemoveEntity(self.Trail)
-	elseif self.CanUseTrail && !IsValid(self.Trail) && RPM > MaxRPM *0.05 then
-		local size = 1000
-		self.Trail = util.SpriteTrail(self, 4, Color(192,153,255), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
-	end
+function ENT:IsEngineStartAllowed()
 	local Driver = self:GetDriver()
+	local Pod = self:GetDriverSeat()
 	
+	if self:GetAI() or not IsValid( Driver ) or not IsValid( Pod ) then return true end
+
+	return true
+end
+
+function ENT:HandleWeapons(Fire1, Fire2)
+	local Driver = self:GetDriver()
 	if IsValid(Driver) then
 		if self:GetAmmoPrimary() > 0 then
-			Fire1 = Driver:KeyReleased(IN_ATTACK)
+			Fire1 = Driver:KeyDown(IN_ATTACK)
+		end
+	end
+
+	if self:GetAI() then
+		if IsValid(self.LastTarget) then
+			Fire1 = true
 		end
 	end
 	
 	if Fire1 then
 		self:PrimaryAttack()
 	end
-end
-
-function ENT:OnEngineStarted()
-	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_up.wav")
-	if IsValid(self:GetDriver()) then
-		self:GetDriver():EmitSound("cpthazama/starfox/vehicles/arwing_enter.wav")
-	end
-
-	self.CanUseTrail = true
-end
-
-function ENT:OnEngineStopped()
-	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_down.wav")
-
-	self.CanUseTrail = false
-	SafeRemoveEntity(self.Trail)
 end
 
 function ENT:AIGetTarget()
@@ -179,7 +197,7 @@ function ENT:AIGetTarget()
 		if IsValid( v ) and v ~= self and v.LFS then
 			local Dist = (v:GetPos() - MyPos):Length()
 			
-			if Dist < TargetDistance /*and self:AITargetInfront( v, 100 )*/ then
+			if Dist < TargetDistance then
 				if not v:IsDestroyed() and v.GetAITEAM then
 					local HisTeam = v:GetAITEAM()
 					if HisTeam ~= 0 then
@@ -198,4 +216,15 @@ function ENT:AIGetTarget()
 	self.LastTarget = ClosestTarget
 	
 	return ClosestTarget
+end
+
+function ENT:OnEngineStarted()
+	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_up.wav")
+	if IsValid(self:GetDriver()) then
+		self:GetDriver():EmitSound("cpthazama/starfox/vehicles/arwing_enter.wav")
+	end
+end
+
+function ENT:OnEngineStopped()
+	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_down.wav")
 end
