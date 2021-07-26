@@ -1,16 +1,18 @@
 "VertexLitGeneric"
 {
-	"$baseTexture" "models/cpthazama/starfox/cornerian_fighter_aparoid/body"
-	"$bumpmap" 	"models/cpthazama/starfox/cornerian_fighter_aparoid/body_n"
+	"$baseTexture" "models/cpthazama/starfox/wolfen_zero/body_a"
+	"$bumpmap" 	"models/cpthazama/starfox/wolfen_zero/body_n"
 	"$phongexponenttexture" "vj_base/exponent"
 	"$phongwarptexture" 	"models/cpthazama/starfox/phongwarp_metal2"
 
-	"$alphatest" "1"
+	// "$alphatest" "1"
 	"$nodecal" "1"
+	"$color2" "[0 0 0]"
+	"$translucent" "1"
 	"$nocull" "1"
 
 	"$phong" 						"1"
-	"$phongexponent" 				"2"
+	"$phongexponent" 				"1"
 	"$phongboost" 					"5"
 	"$phongfresnelranges" 			"[0.75 0.35 1]"
 	"$phongalbedotint" 				"1"

@@ -49,27 +49,30 @@ function ENT:Initialize()
 
 	self.Squad = {}
 
+	local ent = VJ_PICK({"lfs_starfox_wolfen","lfs_starfox_wolfen_zero"})
 	for i = 1,4 do
 		local tbl = self.Squad
 		table.insert(tbl,self)
 
+		local hull = 50
+		local st1 = self:GetPos() +Vector(0,0,15)
 		local tr1 = util.TraceHull({
-			start = self:GetPos(),
-			endpos = self:GetPos() +Vector(0,0,32620),
+			start = st1,
+			endpos = st1 +Vector(0,0,32620),
 			filter = tbl,
-			mins = Vector(-140, -140, -140),
-			maxs = Vector(140, 140, 140),
+			mins = Vector(-hull,-hull,-hull),
+			maxs = Vector(hull,hull,hull),
 		})
-		local startPos = tr1.HitPos +tr1.HitNormal *450
+		local st2 = tr1.HitPos +tr1.HitNormal *450
 		local tr2 = util.TraceHull({
-			start = startPos,
-			endpos = startPos +Vector(math.Rand(-1000,1000),math.Rand(-1000,1000),math.Rand(-1000,450)),
+			start = st2,
+			endpos = st2 +Vector(math.Rand(-1000,1000),math.Rand(-1000,1000),math.Rand(-1000,450)),
 			filter = tbl,
-			mins = Vector(-140, -140, -140),
-			maxs = Vector(140, 140, 140),
+			mins = Vector(-hull,-hull,-hull),
+			maxs = Vector(hull,hull,hull),
 		})
 
-		local vehicle = ents.Create("lfs_starfox_wolfen")
+		local vehicle = ents.Create(ent)
 		vehicle:SetPos(tr2.HitPos +tr2.HitNormal *450)
 		vehicle:SetAngles(self:GetAngles())
 		vehicle:Spawn()
