@@ -1,6 +1,8 @@
 ### [LFSimfphys] Star Fox
 A collection of Star Fox vehicles running on Simfphys and LFS. This pack contains vehicles from both Star Fox Assault and Star Fox Zero, while also improving and adding onto LFS/Simfphys' default code.
 
+![Image](https://github.com/Cpt-Hazama/-LFSimfphys-Star-Fox/blob/master/materials/entities/lfs_starfox_arwing.png?raw=true)
+
 ## Current Vehicles
 - Arwing Mk I
 - Cornerian Fighter Mk II (Infected)
