@@ -24,25 +24,34 @@ function ENT:RunOnSpawn()
 	ramp:SetParent(self)
 	ramp:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
 	ramp:Spawn()
-	ramp:SetType("lfs_starfox_wolfen") -- Replace with Venom Fighters!
+	ramp:SetType("lfs_starfox_venom_fighter")
 	ramp:SetRespawnTime(10)
-	ramp:SetAmount(4)
-	ramp:SetMasterSwitch(true)
+	ramp:SetAmount(5)
+	ramp:SetMasterSwitch(false)
 	self:DeleteOnRemove(ramp)
+	self.Ramp = ramp
+
+	for i = 1,12 do
+		SF.AddAI("Turret_" .. i,self,i)
+	end
 end
 
 function ENT:OnRemove()
 
 end
 
-function ENT:PrimaryAttack()
+function ENT:PrimaryAttack(ai,pos)
 	if not self:CanPrimaryAttack() then return end
 
 	self:SetNextPrimary(0)
 
-	for i = 1, 12 do
-		self:FireTurret(i,self:GetAI() && IsValid(self.LastTarget) && self.LastTarget:GetPos() +self.LastTarget:OBBCenter())
-	end
+	-- if ai && pos then
+	-- 	self:FireTurret(ai,pos)
+	-- else
+		for i = 1, 12 do
+			self:FireTurret(i,self:GetAI() && IsValid(self.LastTarget) && self.LastTarget:GetPos() +self.LastTarget:OBBCenter())
+		end
+	-- end
 end
 
 function ENT:FireTurret(num,targetPos)
@@ -81,9 +90,11 @@ function ENT:FireTurret(num,targetPos)
 end
 
 function ENT:CreateAI()
+	self.Ramp:SetMasterSwitch(true)
 end
 
 function ENT:RemoveAI()
+	self.Ramp:SetMasterSwitch(false)
 end
 
 function ENT:ToggleLandingGear()
@@ -109,11 +120,11 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		end
 	end
 
-	if self:GetAI() then
-		if IsValid(self.LastTarget) then
-			Fire1 = true
-		end
-	end
+	-- if self:GetAI() then
+	-- 	if IsValid(self.LastTarget) then
+	-- 		Fire1 = true
+	-- 	end
+	-- end
 	
 	if Fire1 then
 		self:PrimaryAttack()
