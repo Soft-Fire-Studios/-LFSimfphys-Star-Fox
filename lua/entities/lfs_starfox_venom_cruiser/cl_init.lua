@@ -9,6 +9,17 @@ end
 local mat = Material( "sprites/light_glow02_add" )
 function ENT:Draw()
 	self:DrawModel()
+	
+	if not self:GetEngineActive() then return end
+	
+	local Boost = self.BoostAdd or 0
+	local Size = 8000 + (self:GetRPM() / self:GetLimitRPM()) * 1250 + Boost
+
+	for i = 1,2 do
+		local Mirror = i == 2 && -1 or 1
+		render.SetMaterial(mat)
+		render.DrawSprite(self:LocalToWorld(Vector(-6800,1800 *Mirror,4200)),Size,Size,Color(240,38,31,255))
+	end
 end
 
 local function BoneData(self,bone)

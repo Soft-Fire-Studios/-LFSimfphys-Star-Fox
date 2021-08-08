@@ -6,17 +6,37 @@ function ENT:Initialize()
 	
 end
 
+function ENT:DrawTranslucent()
+	self:DrawModel()
+	return true
+end
+
 local mat = Material( "sprites/light_glow02_add" )
+local Size2 = 500
+local Dir = 1
 function ENT:Draw()
 	self:DrawModel()
 	
 	if not self:GetEngineActive() then return end
 	
 	local Boost = self.BoostAdd or 0
-	local Size = 1000 + (self:GetRPM() / self:GetLimitRPM()) * 300 + Boost
+	local Size = 8000 + (self:GetRPM() / self:GetLimitRPM()) * 2000 + Boost
+	Size2 = math.Clamp(Size2 +(1 *Dir),0,500)
+	if Size2 == 500 then
+		Dir = -1
+	elseif Size2 == 0 then
+		Dir = 1
+	end
 
 	render.SetMaterial(mat)
-	render.DrawSprite(self:LocalToWorld(Vector(-175,0,0)),Size,Size,Color(240,38,31,255))
+	render.DrawSprite(self:GetAttachment(3).Pos,Size2,Size2,Color(255,0,0))
+
+	if self:GetNW2Bool("Camo") then return end
+	for i = 1,2 do
+		local Mirror = i == 2 && -1 or 1
+		render.SetMaterial(mat)
+		render.DrawSprite(self:LocalToWorld(Vector(0,780 *Mirror,100)),Size,Size,Color(240,38,31,255))
+	end
 end
 
 function ENT:ExhaustFX()
@@ -54,7 +74,7 @@ end
 
 function ENT:EngineActiveChanged( bActive )
 	if bActive then
-		self.ENG = CreateSound(self,"LFS_SF_WOLFEN_ENGINE")
+		self.ENG = CreateSound(self,"LFS_SF_GENERIC_ENGINE")
 		self.ENG:PlayEx(0,0)
 	else
 		if self.ENG then
@@ -83,17 +103,17 @@ function ENT:AnimFins()
 	local flap2 = 2
 
 	-- if self.LandingGear then return end
-	self.fracMain = self.fracMain or 0
-	self.fracMain = active && (RPM /MaxRPM) *15 or self.fracMain
+	-- self.fracMain = self.fracMain or 0
+	-- self.fracMain = active && (RPM /MaxRPM) *15 or self.fracMain
 
-	local top = Angle(0,0,-self.fracMain)
-	local bottom = Angle(0,0,self.fracMain)
-	self:ManipulateBoneAngles(wing1,top)
-	self:ManipulateBoneAngles(wingS1,top)
-	self:ManipulateBoneAngles(flap1,top)
-	self:ManipulateBoneAngles(wing2,bottom)
-	self:ManipulateBoneAngles(wingS2,bottom)
-	self:ManipulateBoneAngles(flap2,bottom)
+	-- local top = Angle(0,0,-self.fracMain)
+	-- local bottom = Angle(0,0,self.fracMain)
+	-- self:ManipulateBoneAngles(wing1,top)
+	-- self:ManipulateBoneAngles(wingS1,top)
+	-- self:ManipulateBoneAngles(flap1,top)
+	-- self:ManipulateBoneAngles(wing2,bottom)
+	-- self:ManipulateBoneAngles(wingS2,bottom)
+	-- self:ManipulateBoneAngles(flap2,bottom)
 end
 
 function ENT:AnimRotor()
@@ -125,19 +145,19 @@ function ENT:AnimLandingGear()
 	-- self.LandingGear = TracePlane.Hit
 	-- if !self.LandingGear then return end
 
-	local wing1 = 5
-	local wing2 = 6
-	local wingS1 = 8
-	local wingS2 = 7
-	local flap1 = 1
-	local flap2 = 2
+	-- local wing1 = 5
+	-- local wing2 = 6
+	-- local wingS1 = 8
+	-- local wingS2 = 7
+	-- local flap1 = 1
+	-- local flap2 = 2
 
-	local top = Angle(0,0,-self.fracMain)
-	local bottom = Angle(0,0,self.fracMain)
-	self:ManipulateBoneAngles(wing1,top)
-	self:ManipulateBoneAngles(wingS1,top)
-	self:ManipulateBoneAngles(flap1,top)
-	self:ManipulateBoneAngles(wing2,bottom)
-	self:ManipulateBoneAngles(wingS2,bottom)
-	self:ManipulateBoneAngles(flap2,bottom)
+	-- local top = Angle(0,0,-self.fracMain)
+	-- local bottom = Angle(0,0,self.fracMain)
+	-- self:ManipulateBoneAngles(wing1,top)
+	-- self:ManipulateBoneAngles(wingS1,top)
+	-- self:ManipulateBoneAngles(flap1,top)
+	-- self:ManipulateBoneAngles(wing2,bottom)
+	-- self:ManipulateBoneAngles(wingS2,bottom)
+	-- self:ManipulateBoneAngles(flap2,bottom)
 end

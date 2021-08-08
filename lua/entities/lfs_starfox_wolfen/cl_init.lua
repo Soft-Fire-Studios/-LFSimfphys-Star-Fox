@@ -202,7 +202,7 @@ end
 
 function ENT:EngineActiveChanged( bActive )
 	if bActive then
-		self.ENG = CreateSound( self, "LFS_SF_ARWING_ENGINE" )
+		self.ENG = CreateSound( self, "LFS_SF_WOLFEN_ENGINE" )
 		self.ENG:PlayEx(0,0)
 		-- self.ENG2 = CreateSound( self, "LFS_SF_ARWING_ENGINE2" )
 		-- self.ENG2:PlayEx(0,0)

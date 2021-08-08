@@ -44,10 +44,10 @@ end
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:EmitSound("LFS_SF_ARWING_PRIMARY")
-	self:SetNextPrimary(0.15)
+	self:SetNextPrimary(0.1)
+	-- self:SetNextPrimary(0.15)
 
-	for i = 0,1 do
+	-- for i = 0,1 do
 		self.MirrorPrimary = not self.MirrorPrimary
 		
 		local Mirror = self.MirrorPrimary and 2 or 1
@@ -68,9 +68,10 @@ function ENT:PrimaryAttack()
 			dmginfo:SetDamageType(DMG_AIRBOAT)
 			-- sound.Play("cpthazama/starfox/vehicles/laser_hit.wav", tr.HitPos, 110, 100, 1)
 		end
+		SF.PlaySound(3,bullet.Src,"LFS_SF_ARWING_PRIMARY",nil,nil,nil,true)
 		self:FireBullets(bullet)
 		self:TakePrimaryAmmo()
-	end
+	-- end
 end
 
 function ENT:OnKeyThrottle( bPressed )
@@ -104,7 +105,8 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	
 	if IsValid(Driver) then
 		if self:GetAmmoPrimary() > 0 then
-			Fire1 = Driver:KeyReleased(IN_ATTACK)
+			-- Fire1 = Driver:KeyReleased(IN_ATTACK)
+			Fire1 = Driver:KeyDown(IN_ATTACK)
 		end
 	end
 	

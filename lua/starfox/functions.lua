@@ -13,6 +13,30 @@ SF.BoneData = function(ent,bone)
 	return tbl
 end
 
+SF.PlaySound = function(sndType,ent,snd,vol,pit,delay,cache)
+	delay = delay or 0
+	vol = vol or 75
+	if cache then
+		for _,v in pairs(SF.CachedSounds) do
+			if v.Name == snd then
+				snd = v.Sound
+				vol = v.Level
+				break
+			end
+		end
+	end
+	timer.Simple(delay,function()
+		pit = (pit or 100) *VJ_GetVarInt("host_timescale")
+		if sndType == 1 && IsValid(ent) then
+			VJ_CreateSound(ent,snd,vol,pit)
+		elseif sndType == 2 && IsValid(ent) then
+			VJ_EmitSound(ent,snd,vol,pit)
+		elseif sndType == 3 then
+			sound.Play(VJ_PICK(snd),type(ent) == "Vector" && ent or (IsValid(ent) && ent:GetPos()) or VJ_Vec0,vol,pit,1)
+		end
+	end)
+end
+
 SF.AddSound = function(name,snd,lvl,chan)
 	sound.Add({
 		name = name,
@@ -21,7 +45,7 @@ SF.AddSound = function(name,snd,lvl,chan)
 		level = lvl or 75,
 		sound = snd
 	})
-	table.insert(SF.CachedSounds,{Name=name,Sound=snd})
+	table.insert(SF.CachedSounds,{Name=name,Sound=snd,Level=lvl})
 	print("Successfully added sound '" .. name .. "'!")
 end
 
@@ -31,6 +55,13 @@ SF.AddSound("LFS_SF_ARWING_BOOST","cpthazama/starfox/vehicles/arwing_eng_boost_s
 SF.AddSound("LFS_SF_ARWING_PRIMARY","cpthazama/starfox/vehicles/arwing_laser_single_hit.wav",95,CHAN_WEAPON)
 SF.AddSound("LFS_SF_ARWING_PRIMARY_CHARGED","cpthazama/starfox/vehicles/arwing_fire_charged.wav",95,CHAN_WEAPON)
 SF.AddSound("LFS_SF_ARWING_PRIMARY_DOUBLE","cpthazama/starfox/vehicles/arwing_laser_double.wav",95,CHAN_WEAPON)
+
+SF.AddSound("LFS_SF_WOLFEN_ENGINE","cpthazama/starfox/vehicles/arwing_loop_hover.wav",125)
+SF.AddSound("LFS_SF_WOLFEN_ENGINE2","cpthazama/starfox/vehicles/wolfen_loop.wav",90)
+SF.AddSound("LFS_SF_WOLFEN_BOOST","cpthazama/starfox/vehicles/wolfen_boost2_a.wav",125)
+SF.AddSound("LFS_SF_WOLFEN_BOOST2","cpthazama/starfox/vehicles/wolfen_boost.wav",90)
+
+SF.AddSound("LFS_SF_GENERIC_ENGINE","cpthazama/starfox/vehicles/generic_loop.wav",125)
 
 SF.AddAI = function(name,ent,att)
 	local index = #SF.AITurrets +1

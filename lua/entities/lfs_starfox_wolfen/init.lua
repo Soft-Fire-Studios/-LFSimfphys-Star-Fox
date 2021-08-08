@@ -101,6 +101,12 @@ end
 function ENT:RaiseLandingGear()
 end
 
+function ENT:OnKeyThrottle( bPressed )
+	if bPressed && self.CanUseTrail && !IsValid(self.Trail) then
+		self:EmitSound("LFS_SF_WOLFEN_BOOST")
+	end
+end
+
 function ENT:HandleWeapons(Fire1, Fire2)
 	local RPM = self:GetRPM()
 	local MaxRPM = self:GetMaxRPM()
