@@ -1,7 +1,7 @@
 ENT.Type            = "anim"
 DEFINE_BASECLASS( "lunasflightschool_basescript" )
 
-ENT.PrintName = "Cornerian Fighter (Infected)"
+ENT.PrintName = "Cornerian Fighter Mk. II (Infected)"
 ENT.Author = "Cpt. Hazama"
 ENT.Information = ""
 ENT.Category = "[LFS] Star Fox"

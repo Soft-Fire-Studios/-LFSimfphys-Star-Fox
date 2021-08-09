@@ -4,6 +4,24 @@ SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2
 SF_AI_TEAM_APAROID = 5
 
+if CLIENT then
+	local ships = {
+		["lfs_starfox_arwing"] = "Arwing Mk. II",
+		["lfs_starfox_cornerian_fighter_aparoid"] = "Cornerian Fighter Mk. II (Infected)",
+		["lfs_starfox_venom_bomber"] = "Venomian Stealth Bomber",
+		["lfs_starfox_venom_cruiser"] = "Venomian Cruiser Mk. II",
+		["lfs_starfox_venom_fighter"] = "Venomian Figher Mk. II",
+		["lfs_starfox_wolfen"] = "Wolfen Mk. II",
+		["lfs_starfox_wolfen_zero"] = "Wolfen Mk. I",
+	}
+	for class,name in pairs(ships) do
+		language.Add(class,name)
+		language.Add("#" .. class,name)
+		killicon.Add(class,"HUD/killicons/default",Color(255,80,0,255))
+		killicon.Add("#" .. class,"HUD/killicons/default",Color(255,80,0,255))
+	end
+end
+
 SF_MUS = {}
 
 SF_AI_UNIQUE = {

@@ -131,3 +131,20 @@ function ENT:OnEngineStopped()
 	SafeRemoveEntity(self.Trail1)
 	SafeRemoveEntity(self.Trail2)
 end
+
+function ENT:Destroy()
+	self.Destroyed = true
+	
+	local PObj = self:GetPhysicsObject()
+	if IsValid( PObj ) then
+		PObj:SetDragCoefficient( -20 )
+	end
+
+	local ai = self:GetAI()
+	if !ai then return end
+
+	local attacker = self.FinalAttacker or Entity(0)
+	local inflictor = self.FinalInflictor or Entity(0)
+	if attacker:IsPlayer() then attacker:AddFrags(1) end
+	gamemode.Call("OnNPCKilled",self,attacker,inflictor)
+end
