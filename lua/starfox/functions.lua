@@ -4,6 +4,8 @@ SF = {}
 SF.CachedSounds = {}
 SF.AITurrets = {}
 
+//https://wiki.facepunch.com/gmod/PhysObj:AddAngleVelocity
+
 SF.BoneData = function(ent,bone)
 	local pos,ang = ent:GetBonePosition(bone)
 	local tbl = {}
