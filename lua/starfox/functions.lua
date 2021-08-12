@@ -30,9 +30,9 @@ SF.PlaySound = function(sndType,ent,snd,vol,pit,delay,cache)
 	timer.Simple(delay,function()
 		pit = (pit or 100) *VJ_GetVarInt("host_timescale")
 		if sndType == 1 && IsValid(ent) then
-			VJ_CreateSound(ent,snd,vol,pit)
+			return VJ_CreateSound(ent,snd,vol,pit)
 		elseif sndType == 2 && IsValid(ent) then
-			VJ_EmitSound(ent,snd,vol,pit)
+			return VJ_EmitSound(ent,snd,vol,pit)
 		elseif sndType == 3 then
 			sound.Play(VJ_PICK(snd),type(ent) == "Vector" && ent or (IsValid(ent) && ent:GetPos()) or VJ_Vec0,vol,pit,1)
 		end
@@ -64,6 +64,13 @@ SF.AddSound("LFS_SF_WOLFEN_BOOST","cpthazama/starfox/vehicles/wolfen_boost2_a.wa
 SF.AddSound("LFS_SF_WOLFEN_BOOST2","cpthazama/starfox/vehicles/wolfen_boost.wav",90)
 
 SF.AddSound("LFS_SF_GENERIC_ENGINE","cpthazama/starfox/vehicles/generic_loop.wav",125)
+
+SF.AddSound("LFS_SF64_ARWING_ENGINE","cpthazama/starfox/64/vehicles/Engine.wav",125)
+SF.AddSound("LFS_SF64_ARWING_BOOST","cpthazama/starfox/64/vehicles/Boost.wav",125)
+SF.AddSound("LFS_SF64_ARWING_NITRO","cpthazama/starfox/64/vehicles/ArwingINtro.wav",125)
+
+SF.AddSound("LFS_SF64_WOLFEN_ENGINE","cpthazama/starfox/64/vehicles/Wolfen.wav",125)
+SF.AddSound("LFS_SF64_WOLFEN_BOOST","cpthazama/starfox/64/vehicles/Boost2.wav",125)
 
 SF.AddAI = function(name,ent,att)
 	local index = #SF.AITurrets +1
