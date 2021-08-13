@@ -15,6 +15,32 @@ SF.BoneData = function(ent,bone)
 	return tbl
 end
 
+SF.GetVOLine = function(ent,VO)
+	if !IsValid(ent) then return end
+	local VO = VO or ent:GetNW2String("VO")
+	return ent.VO_DeathSound == true && ent.LinesDeath[VO] or ent.Lines[VO]
+end
+
+SF.PlayVO = function(ply,snd,VO)
+	local snd = VJ_PICK(snd)
+	if !snd then return end
+	local snddur = SoundDuration(snd) +1
+	ply.SF_TalkT = CurTime() +snddur
+	ply.SF_NextTalkT = ply.SF_TalkT +0.2
+	ply.SF_CurrentSound = snd
+	ply.SF_CurrentVO = VO
+	ply.SF_TalkTexture = Material("hud/starfox/vo_" .. VO .. ".vtf")
+
+	ply:EmitSound("cpthazama/starfox/64/RadioTransmissionon.wav",110,100,1)
+	ply:EmitSound(snd,110,100,1)
+	timer.Simple(snddur -0.025,function()
+		if IsValid(ply) && ply.SF_CurrentSound == snd then
+			ply:EmitSound("cpthazama/starfox/64/RadioTransmissionOff.wav",110,100,1)
+		end
+	end)
+	return snddur
+end
+
 SF.PlaySound = function(sndType,ent,snd,vol,pit,delay,cache)
 	delay = delay or 0
 	vol = vol or 75

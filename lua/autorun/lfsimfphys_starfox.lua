@@ -94,24 +94,6 @@ function SF_StopAllTracks()
 		end
 	end
 end
-
-hook.Add("HUDPaint","StarFox_AI",function()
-	local ply = LocalPlayer()
-	local vehicle = ply:lfsGetPlane()
-	if !IsValid(vehicle) then return end
-	ply.SF_NextTalkT = ply.SF_NextTalkT or 0
-	ply.SF_TalkT = ply.SF_TalkT or 0
-	ply.SF_TalkTexture = ply.SF_TalkTexture or nil
-
-	if ply.SF_TalkT > CurTime() then
-		local scale = 350
-		local x = ScrW() *0.075
-		local y = ScrH() *0.87
-		surface.SetMaterial(ply.SF_TalkTexture)
-		surface.SetDrawColor(255,255,255)
-		surface.DrawTexturedRectRotated(x,y,scale,scale,0)
-	end
-end)
 end
 
 print("Successfully Loaded [LFSimfphys] Star Fox Autorun file!")
