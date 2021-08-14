@@ -16,6 +16,8 @@ ENT.MDL = "models/cpthazama/starfox/vehicles/wolfen.mdl"
 
 ENT.AITEAM = 2
 
+ENT.SF_HasSmartBombs = true
+
 ENT.Mass = 2000
 ENT.Inertia = Vector(400000,400000,400000)
 ENT.Drag = -1
@@ -63,6 +65,7 @@ ENT.MaxStability 	= 	1
 
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
+	self:NetworkVar("Float",21,"ChargeT")
 end
 
 sound.Add({

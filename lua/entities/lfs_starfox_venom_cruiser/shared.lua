@@ -24,6 +24,8 @@ ENT.GibModels = {
 
 ENT.AITEAM = SF_AI_TEAM_ANDROSS
 
+ENT.SF_BlockUpgrade = true
+
 ENT.Mass = 30000
 -- local inert = 200000
 -- ENT.Inertia = Vector(inert,inert,inert)

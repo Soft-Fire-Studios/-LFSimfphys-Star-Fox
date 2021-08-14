@@ -6,6 +6,33 @@ SF.AITurrets = {}
 
 //https://wiki.facepunch.com/gmod/PhysObj:AddAngleVelocity
 
+SF.GetLaser = function(ent,tr)
+	if !IsValid(ent) then return end
+	local time = ent:GetNW2Int("LaserUpgradeTime") or 0
+	local upgrade = ent:GetNW2Int("LaserUpgrade") or 0
+	if CurTime() > time then
+		upgrade = 0
+	end
+	local tbl = {}
+	tbl.DMG = upgrade == 2 && 2 or upgrade == 1 && 1.5 or 1
+	tbl.Effect = upgrade == 2 && (tr == "lfs_laser_red" && "lfs_sf_laser_purple" or "lfs_laser_red_large") or upgrade == 1 && "lfs_laser_blue" or tr
+	tbl.Level = upgrade
+	tbl.Time = time -CurTime()
+
+	return tbl
+end
+
+SF.SetSmartBombs = function(ent,i)
+	if !IsValid(ent) then return end
+	ent:SetNW2Int("SmartBombs",i)
+end
+
+SF.GetSmartBombs = function(ent)
+	if !IsValid(ent) then return end
+	local count = ent:GetNW2Int("SmartBombs") or 0
+	return count
+end
+
 SF.BoneData = function(ent,bone)
 	local pos,ang = ent:GetBonePosition(bone)
 	local tbl = {}
@@ -95,7 +122,7 @@ SF.AddSound("LFS_SF64_ARWING_ENGINE","cpthazama/starfox/64/vehicles/Engine.wav",
 SF.AddSound("LFS_SF64_ARWING_BOOST","cpthazama/starfox/64/vehicles/Boost.wav",125)
 SF.AddSound("LFS_SF64_ARWING_NITRO","cpthazama/starfox/64/vehicles/ArwingINtro.wav",125)
 
-SF.AddSound("LFS_SF64_WOLFEN_ENGINE","cpthazama/starfox/64/vehicles/Wolfen.wav",125)
+SF.AddSound("LFS_SF64_WOLFEN_ENGINE","cpthazama/starfox/64/vehicles/Wolfen2.wav",125)
 SF.AddSound("LFS_SF64_WOLFEN_BOOST","cpthazama/starfox/64/vehicles/Boost2.wav",125)
 
 SF.AddAI = function(name,ent,att)

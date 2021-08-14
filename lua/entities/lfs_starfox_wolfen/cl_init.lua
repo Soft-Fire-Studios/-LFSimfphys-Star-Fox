@@ -82,6 +82,12 @@ end
 local mat = Material( "sprites/light_glow02_add" )
 function ENT:Draw()
 	self:DrawModel()
+
+	local isCharging = self:GetChargeT() > CurTime()
+	if isCharging then
+		render.SetMaterial(mat)
+		render.DrawSprite(self:GetAttachment(3).Pos,700,700,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+	end
 	
 	-- if not self:GetEngineActive() then return end
 	

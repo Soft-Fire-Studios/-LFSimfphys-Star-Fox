@@ -43,7 +43,6 @@ function ENT:PrimaryAttack()
 
 	self:EmitSound(isCharged && "LFS_SF_ARWING_PRIMARY_CHARGED" or "LFS_SF_ARWING_PRIMARY")
 	self:SetNextPrimary(isCharged && 1 or 0.15)
-	self:SetNextSecondary(isCharged && 1 or 0.15)
 	
 	if isCharged then
 			local bullet = {}
@@ -68,21 +67,22 @@ function ENT:PrimaryAttack()
 			self:SetChargeT(0)
 			self.CanChargeT = CurTime() +2
 	else
+		local upgrade = SF.GetLaser(self,"lfs_laser_green")
 		for i = 0,1 do
 			self.MirrorPrimary = not self.MirrorPrimary
 			
 			local Mirror = self.MirrorPrimary and 2 or 1
-			
+
 			local bullet = {}
 			bullet.Num 		= 1
 			bullet.Src 		= self:GetAttachment(Mirror).Pos
 			bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 			bullet.Spread 	= Vector(0.01,0.01,0)
 			bullet.Tracer	= 1
-			bullet.TracerName = "lfs_laser_green"
+			bullet.TracerName = upgrade.Effect
 			bullet.Force	= 100
 			bullet.HullSize = 25
-			bullet.Damage	= 40
+			bullet.Damage	= 40 *upgrade.DMG
 			bullet.Attacker = self:GetDriver()
 			bullet.AmmoType = "Pistol"
 			bullet.Callback = function(att,tr,dmginfo)
@@ -91,40 +91,8 @@ function ENT:PrimaryAttack()
 			end
 			self:FireBullets(bullet)
 			self:TakePrimaryAmmo()
+			SF.PlaySound(3,bullet.Src,upgrade.Level > 0 && "LFS_SF_ARWING_PRIMARY_DOUBLE" or "LFS_SF_ARWING_PRIMARY",nil,nil,nil,true)
 		end
-	end
-end
-
-function ENT:SecondaryAttack()
-	if not self:CanSecondaryAttack() then return end
-
-	self:EmitSound("LFS_SF_ARWING_PRIMARY_DOUBLE")
-	self:SetNextPrimary(0.12)
-	self:SetNextSecondary(0.12)
-
-	for i = 0,1 do
-		self.MirrorPrimary = not self.MirrorPrimary
-		
-		local Mirror = self.MirrorPrimary and 2 or 1
-		
-		local bullet = {}
-		bullet.Num 		= 1
-		bullet.Src 		= self:GetAttachment(Mirror).Pos
-		bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
-		bullet.Spread 	= Vector(0.01,0.01,0)
-		bullet.Tracer	= 1
-		bullet.TracerName = "lfs_laser_blue"
-		bullet.Force	= 100
-		bullet.HullSize = 25
-		bullet.Damage	= 65
-		bullet.Attacker = self:GetDriver()
-		bullet.AmmoType = "SMG1"
-		bullet.Callback = function(att,tr,dmginfo)
-			dmginfo:SetDamageType(DMG_AIRBOAT)
-			-- sound.Play("cpthazama/starfox/vehicles/laser_hit.wav", tr.HitPos, 110, 100, 1)
-		end
-		self:FireBullets(bullet)
-		self:TakePrimaryAmmo()
 	end
 end
 
@@ -177,19 +145,11 @@ function ENT:HandleWeapons(Fire1, Fire2)
 				self.CanChargeT = CurTime() +1
 			end
 			Fire1 = Driver:KeyReleased(IN_ATTACK)
-			Fire2 = Driver:KeyReleased(IN_ATTACK2)
 		end
 	end
 	
 	if Fire1 then
 		self:PrimaryAttack()
-	end
-	
-	if self.OldFire2 != Fire2 then
-		if Fire2 then
-			self:SecondaryAttack()
-		end
-		self.OldFire2 = Fire2
 	end
 end
 

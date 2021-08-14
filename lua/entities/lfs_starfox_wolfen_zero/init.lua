@@ -44,34 +44,31 @@ end
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:SetNextPrimary(0.1)
+	self:SetNextPrimary(0.11)
 	-- self:SetNextPrimary(0.15)
 
-	-- for i = 0,1 do
-		self.MirrorPrimary = not self.MirrorPrimary
-		
-		local Mirror = self.MirrorPrimary and 2 or 1
-		
+	local upgrade = SF.GetLaser(self,"lfs_laser_red")
+	for i = 1,2 do		
 		local bullet = {}
 		bullet.Num 		= 1
-		bullet.Src 		= self:GetAttachment(Mirror).Pos
+		bullet.Src 		= self:GetAttachment(i).Pos
 		bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 		bullet.Spread 	= Vector(0.01,0.01,0)
 		bullet.Tracer	= 1
-		bullet.TracerName = "lfs_laser_red"
+		bullet.TracerName = upgrade.Effect
 		bullet.Force	= 100
 		bullet.HullSize = 25
-		bullet.Damage	= 40
+		bullet.Damage	= 40 *upgrade.DMG
 		bullet.Attacker = self:GetDriver()
 		bullet.AmmoType = "Pistol"
 		bullet.Callback = function(att,tr,dmginfo)
 			dmginfo:SetDamageType(DMG_AIRBOAT)
 			-- sound.Play("cpthazama/starfox/vehicles/laser_hit.wav", tr.HitPos, 110, 100, 1)
 		end
-		SF.PlaySound(3,bullet.Src,"LFS_SF_ARWING_PRIMARY",nil,nil,nil,true)
+		SF.PlaySound(3,bullet.Src,upgrade.Level > 0 && "LFS_SF_ARWING_PRIMARY_DOUBLE" or "LFS_SF_ARWING_PRIMARY",nil,nil,nil,true)
 		self:FireBullets(bullet)
 		self:TakePrimaryAmmo()
-	-- end
+	end
 end
 
 function ENT:OnKeyThrottle( bPressed )

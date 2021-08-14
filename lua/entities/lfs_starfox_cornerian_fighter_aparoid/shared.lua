@@ -13,6 +13,8 @@ ENT.MDL = "models/cpthazama/starfox/vehicles/cornerian_fighter_aparoid.mdl"
 
 ENT.AITEAM = SF_AI_TEAM_APAROID
 
+ENT.SF_HasSmartBombs = true
+
 ENT.Mass = 1000
 local inert = 200000
 ENT.Inertia = Vector(inert,inert,inert)

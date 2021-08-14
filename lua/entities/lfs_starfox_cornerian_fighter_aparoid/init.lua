@@ -28,19 +28,19 @@ end
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:EmitSound("LFS_SF_ARWING_PRIMARY")
 	self:SetNextPrimary(0.25)
 
+	local upgrade = SF.GetLaser(self,"lfs_laser_green")
 	local bullet = {}
 	bullet.Num 		= 1
 	bullet.Src 		= self:GetAttachment(1).Pos
 	bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 	bullet.Spread 	= Vector(0.01,0.01,0)
 	bullet.Tracer	= 1
-	bullet.TracerName = "lfs_laser_green"
+	bullet.TracerName = upgrade.Effect
 	bullet.Force	= 100
 	bullet.HullSize = 25
-	bullet.Damage	= 30
+	bullet.Damage	= 30 *upgrade.DMG
 	bullet.Attacker = self:GetDriver()
 	bullet.AmmoType = "Pistol"
 	bullet.Callback = function(att,tr,dmginfo)
@@ -49,6 +49,7 @@ function ENT:PrimaryAttack()
 	end
 	self:FireBullets(bullet)
 	self:TakePrimaryAmmo()
+	SF.PlaySound(3,bullet.Src,upgrade.Level > 0 && "LFS_SF_ARWING_PRIMARY_DOUBLE" or "LFS_SF_ARWING_PRIMARY",nil,nil,nil,true)
 end
 
 function ENT:CreateAI()

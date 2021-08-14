@@ -13,6 +13,8 @@ ENT.MDL = "models/cpthazama/starfox/vehicles/venomian_bomber.mdl"
 
 ENT.AITEAM = SF_AI_TEAM_ANDROSS
 
+ENT.SF_BlockUpgrade = true
+
 ENT.Mass = 2000
 local inert = 100000
 ENT.Inertia = Vector(inert,inert,inert)

@@ -46,25 +46,26 @@ function ENT:PrimaryAttack()
 
 	self:SetNextPrimary(0.15)
 
+	local upgrade = SF.GetLaser(self,"lfs_laser_green")
 	local bullet = {}
 	bullet.Num 		= 1
 	bullet.Src 		= self:GetAttachment(1).Pos
 	bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 	bullet.Spread 	= Vector(0.01,0.01,0)
 	bullet.Tracer	= 1
-	bullet.TracerName = "lfs_laser_green"
+	bullet.TracerName = upgrade.Effect
 	bullet.Force	= 100
 	bullet.HullSize = 25
-	bullet.Damage	= 75
+	bullet.Damage	= 75 *upgrade.DMG
 	bullet.Attacker = self:GetDriver()
 	bullet.AmmoType = "Pistol"
 	bullet.Callback = function(att,tr,dmginfo)
 		dmginfo:SetDamageType(DMG_AIRBOAT)
 		sound.Play("cpthazama/starfox/64/vehicles/Lazerhit.wav", tr.HitPos, 90, 100, 1)
 	end
-	SF.PlaySound(3,bullet.Src,"cpthazama/starfox/64/vehicles/HyperLazer.wav",95,nil,nil,true)
 	self:FireBullets(bullet)
 	self:TakePrimaryAmmo()
+	SF.PlaySound(3,bullet.Src,upgrade.Level > 0 && "cpthazama/starfox/64/vehicles/HyperLazer.wav" or "cpthazama/starfox/64/vehicles/Lazer1.wav",95,nil,nil,true)
 end
 
 function ENT:OnKeyThrottle( bPressed )

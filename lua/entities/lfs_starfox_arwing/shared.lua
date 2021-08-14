@@ -13,6 +13,8 @@ ENT.MDL = "models/cpthazama/starfox/vehicles/arwing.mdl"
 
 ENT.AITEAM = 1
 
+ENT.SF_HasSmartBombs = true
+
 ENT.Mass = 1000
 local inert = 200000
 ENT.Inertia = Vector(inert,inert,inert)

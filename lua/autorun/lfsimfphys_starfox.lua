@@ -59,6 +59,11 @@ function PLY:lfsSetAITeam(iTeam)
 	self:SetNWInt("lfsAITeam",iTeam)
 end
 
+-- function PLY:lfsGetAITeam()
+-- 	print("RAN")
+-- 	return self:GetNWInt("lfsAITeam",simfphys.LFS.PlayerDefaultTeam:GetInt())
+-- end
+
 if CLIENT then
 function SF_CreateTrack(song,ply,ID)
 	if song == false or song == nil then return end

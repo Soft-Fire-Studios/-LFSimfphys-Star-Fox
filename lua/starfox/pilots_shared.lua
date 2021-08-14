@@ -10,10 +10,11 @@ ENT.Lines = {}
 ENT.LinesDeath = {}
 
 local lerpColor = Vector(0,255,63)
+local lerpColor2 = Vector(0,255,63)
+local lerpColor3 = Vector(255,93,0)
 hook.Add("HUDPaint","StarFox_AI",function()
 	local ply = LocalPlayer()
-	-- local vehicle = ply:lfsGetPlane()
-	-- if !IsValid(vehicle) then return end
+
 	ply.SF_NextTalkT = ply.SF_NextTalkT or 0
 	ply.SF_TalkT = ply.SF_TalkT or 0
 	ply.SF_TalkTexture = ply.SF_TalkTexture or nil
@@ -52,7 +53,7 @@ hook.Add("HUDPaint","StarFox_AI",function()
 		lerpColor = LerpVector(FrameTime() *10,lerpColor,hpPercent >= 0.75 && Vector(0,255,63) or hpPercent < 0.75 && hpPercent > 0.25 && Vector(255,255,0) or Vector(255,0,0))
 		draw.RoundedBox(1,posX,posY,len,height,Color(0,0,0,150))
 		draw.RoundedBox(1,posX,posY,math.Clamp(len *(hpPercent),0,boxSize),height,Color(lerpColor.x,lerpColor.y,lerpColor.z))
-		draw.RoundedBox(1,posX,posY,math.Clamp(len *(shieldPercent),0,boxSize),height,Color(0,110,255,math.abs(math.sin(CurTime() *1) *255)))
+		draw.RoundedBox(1,posX,posY,math.Clamp(len *(shieldPercent),0,boxSize),height,Color(0,110,255,math.abs(math.sin(CurTime() *1) *150)))
 
 		surface.SetMaterial(ply.SF_TalkTexture)
 		surface.SetDrawColor(255,255,255)
@@ -75,6 +76,32 @@ hook.Add("HUDPaint","StarFox_AI",function()
 		ply.SF_CurrentSound = nil
 		ply.SF_TalkTexture = nil
 	end
+
+	local vehicle = ply:lfsGetPlane()
+	if !IsValid(vehicle) then return end
+
+	local x = ScrW() *0.7
+	local y = ScrH() *0.41
+	local barLength = 40
+	local barHeight = 250
+	local hp = IsValid(vehicle) && vehicle:GetHP() or 1
+	local hpMax = IsValid(vehicle) && vehicle:GetMaxHP() or 1
+	local hpPercent = hp /hpMax
+	local shield = IsValid(vehicle) && vehicle:GetShield() or 0
+	local shieldMax = IsValid(vehicle) && vehicle:GetMaxShield() or 0
+	local shieldPercent = shield /shieldMax
+	local throttle = IsValid(vehicle) && vehicle:GetThrottlePercent() or 0
+	local throttleMax = 125
+	local throttlePercent = throttle /throttleMax
+	lerpColor2 = LerpVector(FrameTime() *10,lerpColor2,hpPercent >= 0.75 && Vector(0,255,63) or hpPercent < 0.75 && hpPercent > 0.25 && Vector(255,255,0) or Vector(255,0,0))
+	lerpColor3 = LerpVector(FrameTime() *10,lerpColor3,throttlePercent >= 0.805 && Vector(255,0,0) or Vector(255,93,0))
+
+	draw.RoundedBox(1,x,y,barLength,barHeight,Color(5,5,5,150))
+
+	draw.RoundedBox(1,x,y,barLength /2,barHeight *hpPercent,Color(lerpColor.x,lerpColor.y,lerpColor.z))
+	draw.RoundedBox(1,x,y,barLength /2,barHeight *shieldPercent,Color(0,110,255,math.abs(math.sin(CurTime() *1) *150)))
+
+	draw.RoundedBox(1,x *1.0114,y,barLength /2,barHeight *throttlePercent,Color(lerpColor3.x,lerpColor3.y,lerpColor3.z))
 end)
 
 function ENT:DoVOSound()
