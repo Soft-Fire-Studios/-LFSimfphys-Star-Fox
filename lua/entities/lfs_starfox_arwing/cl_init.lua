@@ -9,6 +9,12 @@ end
 local mat = Material( "sprites/light_glow02_add" )
 function ENT:Draw()
 	self:DrawModel()
+
+	local isCharging = self:GetChargeT() > CurTime()
+	if isCharging then
+		render.SetMaterial(mat)
+		render.DrawSprite(self:GetAttachment(5).Pos,700,700,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+	end
 	
 	if not self:GetEngineActive() then return end
 	
@@ -42,28 +48,34 @@ end
 
 function ENT:ExhaustFX()
 	self.nextEFX = self.nextEFX or 0
-	
-	local emitter = ParticleEmitter( self:GetPos(), false )
-	if emitter then
-		local isCharging = self:GetChargeT() > CurTime()
-		local vNormal = self:GetForward()
-		if isCharging then
-			local particle = emitter:Add(mat, self:GetAttachment(3).Pos)
-			if not particle then return end
+	local active = self:GetEngineActive()
+	local vtol = self:GetNW2Bool("VTOL")
 
-			particle:SetVelocity(-self:GetVelocity())
+	if !active or vtol then
+		local emitter = ParticleEmitter(self:GetPos(),false)
+		if emitter then
+			local particle = emitter:Add("particles/fire_glow_sf",self:LocalToWorld(Vector(-25,0,150)))
+			if not particle then return end
+			local size = math.random(45,60)
+			particle:SetVelocity(self:GetUp() *-70 +VectorRand() *70)
+			particle:SetGravity(Vector(0,0,-5))
 			particle:SetLifeTime(0)
-			particle:SetDieTime(0.025)
+			particle:SetDieTime(1)
 			particle:SetStartAlpha(255)
-			particle:SetEndAlpha(220)
-			particle:SetStartSize(math.random(80,100))
-			particle:SetEndSize(math.random(120,130))
-			particle:SetAngles(vNormal:Angle())
-			particle:SetColor(math.random(240,255),math.random(10,20),math.random(10,20))
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(size)
+			particle:SetEndSize(size *0.35)
+			particle:SetAngles(AngleRand() *360)
+			if math.random(1,2) == 1 then
+				particle:SetColor(0,255,63)
+			else
+				particle:SetColor(150,0,255)
+			end
+			emitter:Finish()
 		end
 	end
 
-	if not self:GetEngineActive() then return end
+	if not active then return end
 	
 	local THR = (self:GetRPM() - self.IdleRPM) / (self.LimitRPM - self.IdleRPM)
 	

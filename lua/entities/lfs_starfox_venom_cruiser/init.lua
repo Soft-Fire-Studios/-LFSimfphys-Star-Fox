@@ -131,104 +131,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	end
 end
 
-function ENT:AIGetTarget()
-	self.NextAICheck = self.NextAICheck or 0
-	
-	if self.NextAICheck > CurTime() then return self.LastTarget end
-	
-	self.NextAICheck = CurTime() + 2
-	
-	local MyPos = self:GetPos()
-	local MyTeam = self:GetAITEAM()
-
-	if MyTeam == 0 then self.LastTarget = NULL return NULL end
-
-	local players = player.GetAll()
-
-	local ClosestTarget = NULL
-	local TargetDistance = 60000
-
-	if not simfphys.LFS.IgnorePlayers then
-		for _, v in pairs( players ) do
-			if IsValid( v ) then
-				if v:Alive() then
-					local Dist = (v:GetPos() - MyPos):Length()
-					if Dist < TargetDistance then
-						local Plane = v:lfsGetPlane()
-						
-						if IsValid( Plane ) then
-							if not Plane:IsDestroyed() and Plane ~= self then
-								local HisTeam = Plane:GetAITEAM()
-								if HisTeam ~= 0 then
-									if HisTeam ~= MyTeam or HisTeam == 3 then
-										ClosestTarget = v
-										TargetDistance = Dist
-									end
-								end
-							end
-						else
-							local HisTeam = v:lfsGetAITeam()
-							-- if v:IsLineOfSightClear( self ) then
-								if HisTeam ~= 0 then
-									if HisTeam ~= MyTeam or HisTeam == 3 then
-										ClosestTarget = v
-										TargetDistance = Dist
-									end
-								end
-							-- end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	if not simfphys.LFS.IgnoreNPCs then
-		for _, v in pairs( self:AIGetNPCTargets() ) do
-			if IsValid( v ) then
-				local HisTeam = self:AIGetNPCRelationship( v:GetClass() )
-				if HisTeam ~= "0" then
-					if HisTeam ~= MyTeam or HisTeam == 3 then
-						local Dist = (v:GetPos() - MyPos):Length()
-						if Dist < TargetDistance then
-							-- if self:CanSee( v ) then
-								ClosestTarget = v
-								TargetDistance = Dist
-							-- end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	self.FoundPlanes = simfphys.LFS:PlanesGetAll()
-	
-	for _, v in pairs( self.FoundPlanes ) do
-		if IsValid( v ) and v ~= self and v.LFS then
-			local Dist = (v:GetPos() - MyPos):Length()
-			
-			if Dist < TargetDistance then
-				if not v:IsDestroyed() and v.GetAITEAM then
-					local HisTeam = v:GetAITEAM()
-					if HisTeam ~= 0 then
-						if HisTeam ~= self:GetAITEAM() or HisTeam == 3 then
-							-- if self:CanSee( v ) then
-								ClosestTarget = v
-								TargetDistance = Dist
-							-- end
-						end
-					end
-				end
-			end
-		end
-	end
-
-	self.LastTarget = ClosestTarget
-	
-	return ClosestTarget
-end
-
 function ENT:OnEngineStarted()
 	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_up.wav")
 	if IsValid(self:GetDriver()) then
@@ -241,18 +143,10 @@ function ENT:OnEngineStopped()
 end
 
 function ENT:Destroy()
-	self.Destroyed = true
-	
-	local PObj = self:GetPhysicsObject()
-	if IsValid( PObj ) then
-		PObj:SetDragCoefficient( -20 )
-	end
+	SF.Destroy(self)
+	SF.OnDestroyed(self,1)
+end
 
-	local ai = self:GetAI()
-	if !ai then return end
-
-	local attacker = self.FinalAttacker or Entity(0)
-	local inflictor = self.FinalInflictor or Entity(0)
-	if attacker:IsPlayer() then attacker:AddFrags(1) end
-	gamemode.Call("OnNPCKilled",self,attacker,inflictor)
+function ENT:AIGetTarget()
+	return SF.FindEnemy(self)
 end

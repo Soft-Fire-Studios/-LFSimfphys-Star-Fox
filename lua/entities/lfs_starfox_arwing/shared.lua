@@ -39,7 +39,7 @@ ENT.LimitRPM = 4000
 -- ENT.ElevatorPos = Vector(-223.62,0,51.35)
 -- ENT.RudderPos = Vector(-223.33,0,66.8)
 
-ENT.RotorPos = Vector(225,0,10)
+ENT.RotorPos = Vector(225,0,100)
 ENT.WingPos = Vector(100,0,10)
 ENT.ElevatorPos = Vector(-200,0,10)
 ENT.RudderPos = Vector(-200,0,10)
@@ -62,6 +62,7 @@ ENT.VtolAllowInputBelowThrottle = 10
 ENT.MaxThrustVtol = 10000
 
 ENT.MaxPrimaryAmmo = 10000
+ENT.MaxSecondaryAmmo = 10
 
 ENT.Stability 	= 	0.8
 ENT.MaxStability 	= 	0.8

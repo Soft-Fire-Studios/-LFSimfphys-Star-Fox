@@ -7,6 +7,11 @@ SWEP.Contact					= "http://steamcommunity.com/groups/vrejgaming"
 SWEP.Purpose					= "This weapon is made for Players and NPCs"
 SWEP.Instructions				= "Controls are like a regular weapon."
 SWEP.Category					= "Star Fox"
+
+SWEP.WorldModel_UseCustomPosition = true -- Should the gun use custom position? This can be used to fix guns that are in the crotch
+SWEP.WorldModel_CustomPositionAngle = Vector(0, 0, 180)
+SWEP.WorldModel_CustomPositionOrigin = Vector(0, 3, 0)
+
 	-- Client Settings ---------------------------------------------------------------------------------------------------------------------------------------------
 if CLIENT then
 SWEP.Slot						= 2 -- Which weapon slot you want your SWEP to be in? (1 2 3 4 5 6) 
@@ -28,13 +33,13 @@ SWEP.Primary.Damage				= 8 -- Damage
 SWEP.Primary.Force				= 5 -- Force applied on the object the bullet hits
 SWEP.Primary.ClipSize			= 50 -- Max amount of bullets per clip
 SWEP.Primary.Recoil				= 0.6 -- How much recoil does the player get?
-SWEP.Primary.Delay				= 0.2 -- Time until it can shoot again
+SWEP.Primary.Delay				= 0.15 -- Time until it can shoot again
 SWEP.Primary.TracerType			= "lfs_laser_green" -- Tracer type (Examples: AR2, laster, 9mm)
 SWEP.Primary.Automatic			= false -- Is it automatic?
 SWEP.Primary.Ammo				= "AR2" -- Ammo type
-SWEP.Primary.Sound				= {"vj_weapons/blaster/blaster_fire.wav"} -- npc/roller/mine/rmine_explode_shock1.wav
+SWEP.Primary.Sound				= {"cpthazama/starfox/vehicles/arwing_laser_single_hit.wav"} -- npc/roller/mine/rmine_explode_shock1.wav
 SWEP.Primary.HasDistantSound	= false -- Does it have a distant sound when the gun is shot?
-SWEP.PrimaryEffects_MuzzleParticles = {"vj_rifle_smoke","vj_rifle_smoke_dark","vj_rifle_smoke_flash","vj_rifle_sparks2"}
+SWEP.PrimaryEffects_MuzzleParticles = {"vj_rifle_smoke","vj_rifle_smoke_dark","vj_rifle_smoke_flash"}
 SWEP.PrimaryEffects_MuzzleParticlesAsOne = true -- If set to true, the base will spawn all the given particles instead of picking one
 SWEP.PrimaryEffects_MuzzleAttachment = "muzzle"
 SWEP.PrimaryEffects_SpawnShells = false

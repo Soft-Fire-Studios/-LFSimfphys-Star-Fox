@@ -86,7 +86,7 @@ function ENT:Draw()
 	local isCharging = self:GetChargeT() > CurTime()
 	if isCharging then
 		render.SetMaterial(mat)
-		render.DrawSprite(self:GetAttachment(3).Pos,700,700,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+		render.DrawSprite(self:GetAttachment(5).Pos,700,700,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
 	end
 	
 	-- if not self:GetEngineActive() then return end
@@ -121,8 +121,34 @@ end
 
 function ENT:ExhaustFX()
 	self.nextEFX = self.nextEFX or 0
+	local active = self:GetEngineActive()
+	local vtol = self:GetNW2Bool("VTOL")
 
-	if not self:GetEngineActive() then return end
+	if !active or vtol then
+		local emitter = ParticleEmitter(self:GetPos(),false)
+		if emitter then
+			local particle = emitter:Add("particles/fire_glow_sf",self:LocalToWorld(Vector(5,0,-70)))
+			if not particle then return end
+			local size = math.random(45,60)
+			particle:SetVelocity(self:GetUp() *-70 +VectorRand() *70)
+			particle:SetGravity(Vector(0,0,-5))
+			particle:SetLifeTime(0)
+			particle:SetDieTime(1)
+			particle:SetStartAlpha(255)
+			particle:SetEndAlpha(0)
+			particle:SetStartSize(size)
+			particle:SetEndSize(size *0.35)
+			particle:SetAngles(AngleRand() *360)
+			if math.random(1,2) == 1 then
+				particle:SetColor(0,255,63)
+			else
+				particle:SetColor(150,0,255)
+			end
+			emitter:Finish()
+		end
+	end
+
+	if not active then return end
 	
 	local THR = (self:GetRPM() - self.IdleRPM) / (self.LimitRPM - self.IdleRPM)
 	

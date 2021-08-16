@@ -13,6 +13,8 @@ if CLIENT then
 		["lfs_starfox_venom_fighter"] = "Venomian Figher Mk. II",
 		["lfs_starfox_wolfen"] = "Wolfen Mk. II",
 		["lfs_starfox_wolfen_zero"] = "Wolfen Mk. I",
+		["lfs_starfox_wolfen_ii"] = "Wolfen II (64)",
+		["lfs_starfox_wolfen_ii_zero"] = "Wolfen II",
 	}
 	for class,name in pairs(ships) do
 		language.Add(class,name)
@@ -58,11 +60,6 @@ function PLY:lfsSetAITeam(iTeam)
 	end
 	self:SetNWInt("lfsAITeam",iTeam)
 end
-
--- function PLY:lfsGetAITeam()
--- 	print("RAN")
--- 	return self:GetNWInt("lfsAITeam",simfphys.LFS.PlayerDefaultTeam:GetInt())
--- end
 
 if CLIENT then
 function SF_CreateTrack(song,ply,ID)

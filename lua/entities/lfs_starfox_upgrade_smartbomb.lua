@@ -39,11 +39,14 @@ end
 if !SERVER then return end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:DoUpgrade(ent)
-	ent:SetNW2Int("SmartBombs",ent:GetNW2Int("SmartBombs") +1)
+	local ammo = ent:GetAmmoSecondary()
+	ent:SetAmmoSecondary(ammo +1)
+	-- ent:SetNW2Int("SmartBombs",ent:GetNW2Int("SmartBombs") +1)
 	VJ_CreateSound(ent,"cpthazama/starfox/vehicles/arwing_enter.wav",80,110)
 
 	if IsValid(ent:GetDriver()) then
-		ent:GetDriver():ChatPrint("[Ammo Aquired] You now have " .. ent:GetNW2Int("SmartBombs") .. " Smart Bomb(s)!")
+		ent:GetDriver():ChatPrint("[Ammo Aquired] You now have " .. ammo +1 .. " Smart Bomb(s)!")
+		-- ent:GetDriver():ChatPrint("[Ammo Aquired] You now have " .. ent:GetNW2Int("SmartBombs") .. " Smart Bomb(s)!")
 	end
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------

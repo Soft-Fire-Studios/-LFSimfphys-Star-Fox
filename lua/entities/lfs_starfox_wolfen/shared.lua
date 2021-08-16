@@ -59,6 +59,7 @@ ENT.VtolAllowInputBelowThrottle = 10
 ENT.MaxThrustVtol = 10000
 
 ENT.MaxPrimaryAmmo = 10000
+ENT.MaxSecondaryAmmo = 10
 
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	1

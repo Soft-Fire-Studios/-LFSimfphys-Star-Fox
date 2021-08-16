@@ -48,11 +48,13 @@ function ENT:PrimaryAttack()
 	-- self:SetNextPrimary(0.15)
 
 	local upgrade = SF.GetLaser(self,"lfs_laser_red")
+
+	local target = self:GetAI() && SF.FindEnemy(self) -- This vehicle has Multi-Target capabilities
 	for i = 1,2 do		
 		local bullet = {}
 		bullet.Num 		= 1
 		bullet.Src 		= self:GetAttachment(i).Pos
-		bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
+		bullet.Dir 		= IsValid(target) && (target:GetPos() -bullet.Src):Angle():Forward() or self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 		bullet.Spread 	= Vector(0.01,0.01,0)
 		bullet.Tracer	= 1
 		bullet.TracerName = upgrade.Effect
@@ -136,18 +138,10 @@ function ENT:OnEngineStopped()
 end
 
 function ENT:Destroy()
-	self.Destroyed = true
-	
-	local PObj = self:GetPhysicsObject()
-	if IsValid( PObj ) then
-		PObj:SetDragCoefficient( -20 )
-	end
+	SF.Destroy(self)
+	SF.OnDestroyed(self,1)
+end
 
-	local ai = self:GetAI()
-	if !ai then return end
-
-	local attacker = self.FinalAttacker or Entity(0)
-	local inflictor = self.FinalInflictor or Entity(0)
-	if attacker:IsPlayer() then attacker:AddFrags(1) end
-	gamemode.Call("OnNPCKilled",self,attacker,inflictor)
+function ENT:AIGetTarget()
+	return SF.FindEnemy(self)
 end
