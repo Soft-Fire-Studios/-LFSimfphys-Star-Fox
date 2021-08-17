@@ -231,12 +231,13 @@ else
 	end
 
 	local mat = Material("sprites/light_glow02_add")
+	local mat2 = Material("particles/starfox/charge")
 	function ENT:Draw()
 		local laser = self:GetLaser()
 		if !laser then self:DrawModel() end
 
-		render.SetMaterial(mat)
-		render.DrawSprite(self:GetPos(),laser && 800 or 400,laser && 800 or 400,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+		render.SetMaterial(laser && mat2 or mat)
+		render.DrawSprite(self:GetPos(),laser && 500 or 400,laser && 500 or 400,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
 	end
 
 	function ENT:SoundStop()

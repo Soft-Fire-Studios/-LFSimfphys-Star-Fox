@@ -137,6 +137,82 @@ function ENT:PilotThink()
 	end
 end
 
+function ENT:OnTakeDamage( dmginfo )
+	self:TakePhysicsDamage( dmginfo )
+
+	self:StopMaintenance()
+
+	local Damage = dmginfo:GetDamage()
+	local CurHealth = self:GetHP()
+	local NewHealth = math.Clamp( CurHealth - Damage , -self:GetMaxHP(), self:GetMaxHP() )
+	local ShieldCanBlock = dmginfo:IsBulletDamage() or dmginfo:IsDamageType( DMG_AIRBOAT )
+
+	if ShieldCanBlock then
+		local dmgNormal = -dmginfo:GetDamageForce():GetNormalized() 
+		local dmgPos = dmginfo:GetDamagePosition()
+
+		self:SetNextShieldRecharge( 3 )
+
+		if self:GetMaxShield() > 0 and self:GetShield() > 0 then
+			dmginfo:SetDamagePosition( dmgPos + dmgNormal * 250 * self:GetShieldPercent() )
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( dmginfo:GetDamagePosition() )
+				effectdata:SetEntity( self )
+			util.Effect( "lfs_shield_deflect", effectdata )
+
+			self:TakeShieldDamage( Damage )
+		else
+			sound.Play( Sound( table.Random( {"physics/metal/metal_sheet_impact_bullet2.wav","physics/metal/metal_sheet_impact_hard2.wav","physics/metal/metal_sheet_impact_hard6.wav",} ) ), dmgPos, SNDLVL_70dB)
+	
+			local effectdata = EffectData()
+				effectdata:SetOrigin( dmgPos )
+				effectdata:SetNormal( dmgNormal )
+			util.Effect( "MetalSpark", effectdata )
+			
+			self:SetHP( NewHealth )
+		end
+	else
+		self:SetHP( NewHealth )
+	end
+
+	SF.OnDamage(self,dmginfo)
+	
+	if NewHealth <= 0 and not (self:GetShield() > Damage and ShieldCanBlock) then
+		if not self:IsDestroyed() then
+			self.FinalAttacker = dmginfo:GetAttacker() 
+			self.FinalInflictor = dmginfo:GetInflictor()
+
+			self:Destroy()
+			
+			self.MaxPerfVelocity = self.MaxPerfVelocity * 10
+			local ExplodeTime = self:IsSpaceShip() and (math.Clamp((self:GetVelocity():Length() - 250) / 500,1.5,8) * math.Rand(0.2,1)) or (self:GetAI() and 30 or 9999)
+			if self:IsGunship() then ExplodeTime = math.Rand(1,2) end
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( self:GetPos() )
+			util.Effect( "lfs_explosion_nodebris", effectdata )
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( self:GetPos() )
+				effectdata:SetStart( self:GetPhysicsObject():GetMassCenter() )
+				effectdata:SetEntity( self )
+				effectdata:SetScale( 1 )
+				effectdata:SetMagnitude( ExplodeTime )
+			util.Effect( "lfs_firetrail", effectdata )
+
+			timer.Simple( ExplodeTime, function()
+				if not IsValid( self ) then return end
+				self:Explode()
+			end)
+		end
+	end
+
+	if NewHealth <= -self:GetMaxHP() then
+		self:Explode()
+	end
+end
+
 print("Successfully Loaded [LFSimfphys] Star Fox Pilot AI file!")
 
 if CLIENT then return end -- Start Server Side Code

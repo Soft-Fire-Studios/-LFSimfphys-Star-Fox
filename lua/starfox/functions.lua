@@ -1,10 +1,56 @@
 print("Loading [LFSimfphys] Star Fox Functions file...")
 
+//https://wiki.facepunch.com/gmod/PhysObj:AddAngleVelocity
+
 SF = {}
 SF.CachedSounds = {}
 SF.AITurrets = {}
 
-//https://wiki.facepunch.com/gmod/PhysObj:AddAngleVelocity
+local viewLerpVec = Vector(0,0,0)
+local viewLerpAng = Angle(0,0,0)
+SF.CalcThirdView = function(self,view,ply)
+	local FT = FrameTime() *(GetConVar("lfs_sf_cameraspeed"):GetInt() or 4)
+	local pos = view.origin
+	local ang = view.angles
+
+	viewLerpVec = LerpVector(FT,viewLerpVec,pos)
+	viewLerpAng = LerpAngle(FT,viewLerpAng,ang)
+
+	view.origin = viewLerpVec
+	view.angles = viewLerpAng
+	return view
+end
+
+local cMat1 = Material("hud/starfox/HUD_Crosshair.png")
+local cMat2 = Material("hud/starfox/HUD_Crosshair_Outer.png")
+SF.PaintCrosshair = function(self,HitPlane,HitPilot)
+	local x,y = HitPlane.x,HitPlane.y
+	local x2,y2 = HitPilot.x,HitPilot.y
+	local scale = 60
+
+	surface.SetMaterial(cMat1)
+	surface.SetDrawColor(0,255,63)
+	surface.DrawTexturedRectRotated(x,y,scale,scale,0)
+
+	surface.SetMaterial(cMat2)	
+	surface.SetDrawColor(0,255,63)
+	surface.DrawTexturedRectRotated(x2 +1,y2 +1,scale,scale,0)
+end
+
+SF.PaintInfoLine = function(self,HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREELOOK)
+	surface.SetDrawColor(0,255,63,100)
+	if Len > 34 then
+		local FailStart = LFS_TIME_NOTIFY > CurTime()
+		if FailStart then
+			surface.SetDrawColor(255,0,0,math.abs(math.cos(CurTime() *10)) *255)
+		end
+		if not FREELOOK or FailStart then
+			surface.DrawLine(HitPlane.x +Dir.x *10,HitPlane.y +Dir.y *10,HitPilot.x -Dir.x *34,HitPilot.y -Dir.y *34)
+			surface.SetDrawColor(0,0,0,50)
+			surface.DrawLine(HitPlane.x +Dir.x *10 +1,HitPlane.y +Dir.y *10 +1,HitPilot.x -Dir.x *34 +1,HitPilot.y -Dir.y *34 +1)
+		end
+	end
+end
 
 SF.GetLaser = function(ent,tr)
 	if !IsValid(ent) then return end
@@ -31,6 +77,40 @@ SF.GetSmartBombs = function(ent)
 	if !IsValid(ent) then return end
 	local count = ent:GetNW2Int("SmartBombs") or 0
 	return count
+end
+
+SF.HoverMode = function(self,minDist,str)
+	if !IsValid(self) then return end
+	if self:GetEngineActive() then /*self:GetPhysicsObject():EnableMotion(true)*/ return end
+
+	local minDist = minDist or 80
+	local str = str or 200
+
+	local PhysObj = self:GetPhysicsObject()
+	local Mass = PhysObj:GetMass()
+	local vel = PhysObj:GetVelocity():Length()
+	local tr = util.TraceHull({
+		start = self:GetPos(),
+		endpos = self:GetPos() +Vector(0,0,-minDist),
+		filter = self,
+		mins = self:OBBMins(),
+		maxs = self:OBBMaxs()
+	})
+	-- local tr = util.TraceLine({
+	-- 	start = self:GetPos(),
+	-- 	endpos = self:GetPos() +Vector(0,0,-minDist),
+	-- 	filter = self
+	-- })
+	-- Entity(1):ChatPrint(tostring(tr.Hit))
+	if tr.Hit then
+		PhysObj:SetMass(2)
+		PhysObj:ApplyForceCenter(self:GetUp() *(self:WorldToLocal(self:GetPos() +Vector(0,0,Mass *str))))
+		-- PhysObj:ApplyForceCenter(self:GetUp() *(self:WorldToLocal(self:GetPos() +Vector(0,0,tr.HitPos:Distance(self:GetPos()) *str))) *Mass)
+		-- PhysObj:EnableMotion(false)
+	else
+		PhysObj:SetMass(self.Mass)
+		-- PhysObj:EnableMotion(true)
+	end
 end
 
 SF.BoneData = function(ent,bone)
@@ -129,6 +209,9 @@ SF.AddSound("LFS_SF64_ARWING_NITRO","cpthazama/starfox/64/vehicles/ArwingINtro.w
 SF.AddSound("LFS_SF64_WOLFEN_ENGINE","cpthazama/starfox/64/vehicles/Wolfen2.wav",125)
 SF.AddSound("LFS_SF64_WOLFEN_BOOST","cpthazama/starfox/64/vehicles/Boost2.wav",125)
 
+SF.AddSound("LFS_SFEH_SHARPCLAW_FIRE","cpthazama/starfox/eh/w_sharpclawhyper1.wav",95,CHAN_WEAPON)
+SF.AddSound("LFS_SFEH_SOUL_UP","cpthazama/starfox/eh/w_soulup1.wav",125)
+
 SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 	local startpos = self:GetRotorPos()
 	local tr = util.TraceHull({
@@ -178,6 +261,38 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 		end
 	end
 	constraint.NoCollide(ent,self,0,0)
+end
+
+SF.ForceVOSound = function(ply,self,snd,VO)
+	local function PlaySound(ply)
+		local plyTeam = ply:lfsGetAITeam()
+		local team = self:GetNW2Int("Team")
+		local reqTeam = GetConVar("lfs_sf_voteams"):GetBool()
+		if self:GetAI() && (reqTeam && team != plyTeam or true) then
+			local snddur = SF.PlayVO(ply,snd,VO)
+			if snddur == nil then return end
+			ply.SF_CurrentVOEntity = self
+			self.SF_NextTalkT = CurTime() +snddur +math.Rand(15,40)
+		end
+	end
+
+	if ply then
+		PlaySound(ply)
+	else
+		for _,ply in RandomPairs(player.GetAll()) do
+			PlaySound(ply)
+		end
+	end
+end
+
+SF.OnDamage = function(self,dmginfo)
+	-- if self.PilotCode && self:GetAI() then
+	-- 	local VO = self:GetNW2String("VO")
+	-- 	print(VO,self)
+	-- 	if VO && self.LinesPain && self.LinesPain[VO] then
+	-- 		SF.ForceVOSound(nil,self,self.LinesPain[VO],VO)
+	-- 	end
+	-- end
 end
 
 SF.Destroy = function(self)

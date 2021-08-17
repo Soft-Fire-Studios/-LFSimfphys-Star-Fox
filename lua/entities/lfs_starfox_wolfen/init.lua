@@ -47,7 +47,6 @@ function ENT:PrimaryAttack(isCharged)
 	if not self:CanPrimaryAttack() then return end
 	isCharged = isCharged or (self:GetChargeT() -CurTime()) >= 6
 
-	self:EmitSound(isCharged && "LFS_SF_ARWING_PRIMARY_CHARGED" or "LFS_SF_ARWING_PRIMARY")
 	self:SetNextPrimary(isCharged && 1 or 0.15)
 	
 	if isCharged then

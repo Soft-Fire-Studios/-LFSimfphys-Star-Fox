@@ -2,18 +2,31 @@
 
 include("shared.lua")
 
+function ENT:LFSCalcViewThirdPerson(view,ply)
+	return SF.CalcThirdView(self,view,ply)
+end
+
+function ENT:LFSHudPaintCrosshair(HitPlane,HitPilot)
+	SF.PaintCrosshair(self,HitPlane,HitPilot)
+end
+
+function ENT:LFSHudPaintInfoLine(HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREELOOK)
+	SF.PaintInfoLine(self,HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREELOOK)
+end
+
 function ENT:Initialize()
 	
 end
 
 local mat = Material( "sprites/light_glow02_add" )
+local mat2 = Material("particles/starfox/charge")
 function ENT:Draw()
 	self:DrawModel()
 
 	local isCharging = self:GetChargeT() > CurTime()
 	if isCharging then
-		render.SetMaterial(mat)
-		render.DrawSprite(self:GetAttachment(5).Pos,700,700,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+		render.SetMaterial(mat2)
+		render.DrawSprite(self:GetAttachment(5).Pos,300,300,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
 	end
 	
 	if not self:GetEngineActive() then return end

@@ -65,6 +65,18 @@ ENT.LinesDeath["Pigma"] = {
 	"cpthazama/starfox/vo/pigma/Pigmathis cant be happening.mp3",
 }
 
+function ENT:LFSCalcViewThirdPerson(view,ply)
+	return SF.CalcThirdView(self,view,ply)
+end
+
+function ENT:LFSHudPaintCrosshair(HitPlane,HitPilot)
+	SF.PaintCrosshair(self,HitPlane,HitPilot)
+end
+
+function ENT:LFSHudPaintInfoLine(HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREELOOK)
+	SF.PaintInfoLine(self,HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREELOOK)
+end
+
 function ENT:Think()
 	self:AnimCabin()
 	self:AnimLandingGear()

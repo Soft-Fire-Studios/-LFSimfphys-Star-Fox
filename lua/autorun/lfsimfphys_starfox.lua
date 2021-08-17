@@ -1,6 +1,7 @@
 print("Loading [LFSimfphys] Star Fox Autorun file...")
 
 CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"If enabled, only enemy VO will appear on your screen")
+CreateConVar("lfs_sf_cameraspeed",3,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Update speed of the third person camera")
 
 SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2
@@ -17,6 +18,7 @@ if CLIENT then
 		["lfs_starfox_wolfen_zero"] = "Wolfen Mk. I",
 		["lfs_starfox_wolfen_ii"] = "Wolfen II (64)",
 		["lfs_starfox_wolfen_ii_zero"] = "Wolfen II",
+		["lfs_starfox_wolfen_redfang"] = "Wolfen Mk. III",
 	}
 	for class,name in pairs(ships) do
 		language.Add(class,name)
