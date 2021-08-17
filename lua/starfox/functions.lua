@@ -204,11 +204,17 @@ SF.OnDestroyed = function(self,spawnChance)
 		local p = VJ_PICK({
 			"lfs_starfox_upgrade_blue",
 			"lfs_starfox_upgrade_blue",
-			"lfs_starfox_upgrade_blue",
 			"lfs_starfox_upgrade_red",
 			"lfs_starfox_upgrade_smartbomb",
 			"lfs_starfox_upgrade_smartbomb",
 			"lfs_starfox_upgrade_smartbomb",
+			"lfs_starfox_upgrade_silver",
+			"lfs_starfox_upgrade_silver",
+			"lfs_starfox_upgrade_silver",
+			"lfs_starfox_upgrade_silver",
+			"lfs_starfox_upgrade_gold",
+			"lfs_starfox_upgrade_gold",
+			"lfs_starfox_upgrade_gold",
 		})
 		local item = ents.Create(p)
 		if !IsValid(item) then return end

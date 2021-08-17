@@ -1,5 +1,7 @@
 print("Loading [LFSimfphys] Star Fox Autorun file...")
 
+CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"If enabled, only enemy VO will appear on your screen")
+
 SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2
 SF_AI_TEAM_APAROID = 5

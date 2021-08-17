@@ -108,7 +108,8 @@ function ENT:DoVOSound()
 	for _,ply in RandomPairs(player.GetAll()) do
 		local plyTeam = ply:lfsGetAITeam()
 		local team = self:GetNW2Int("Team")
-		if self:GetAI() && team != plyTeam then
+		local reqTeam = GetConVar("lfs_sf_voteams"):GetBool()
+		if self:GetAI() && (reqTeam && team != plyTeam or true) then
 			-- local vehicle = ply:lfsGetPlane()
 			-- if !IsValid(vehicle) then continue end
 			local VO = self:GetNW2String("VO")
