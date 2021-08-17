@@ -1,19 +1,22 @@
 ### [LFSimfphys] Star Fox
-A collection of Star Fox vehicles running on Simfphys and LFS. This pack contains vehicles from both Star Fox Assault and Star Fox Zero, while also improving and adding onto LFS/Simfphys' default code.
+A collection of Star Fox vehicles running on Simfphys and LFS. This pack contains vehicles from both Star Fox Assault, Star Fox Zero and Star Fox 64, while also improving and adding onto LFS/Simfphys' default code.
 
 ![Image](https://trello.com/1/cards/60fb76439852af875597f45b/attachments/61175b3969e3ef021ae7ad08/download/20210812233818_1.jpg?raw=true)
 
 ## Current Vehicles
-- Arwing Mk I
+- Arwing Mk II
 - Cornerian Fighter Mk II (Infected)
 - Venomian Carrier Mk II
 - Venomian Fighter Mk II
 - Venomian Stealth Bomber
 - Wolfen Mk I
 - Wolfen Mk II
+- Wolfen II
+- Wolfen II (64)
 
 ## Current Entities
 - NPC versions of each vehicle
+- Entities for the vehicles
 - Star Wolf (Spawns Team Star Wolf to enter the battle, along with their signature theme)
 
 ## Unique Features
