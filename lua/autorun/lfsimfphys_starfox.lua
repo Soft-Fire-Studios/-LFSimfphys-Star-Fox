@@ -22,6 +22,27 @@ if CLIENT then
 		killicon.Add(class,"HUD/killicons/default",Color(255,80,0,255))
 		killicon.Add("#" .. class,"HUD/killicons/default",Color(255,80,0,255))
 	end
+
+	SF_AI_TRANSLATE = {
+		["Fox"] = "Fox McCloud",
+		["Falco"] = "Falco Lombardi",
+		["Slippy"] = "Slippy Toad",
+		["Peppy"] = "Peppy Hare",
+		["Krystal"] = "Krystal",
+		["Bill"] = "Bill Grey",
+		["Dash"] = "Dash Bowman",
+		["James"] = "James McCloud",
+		["Katt"] = "Katt Monroe",
+
+		["Wolf"] = "Wolf O'Donnell",
+		["Leon"] = "Leon Powalski",
+		["Andrew"] = "Andrew Oikonny",
+		["Pigma"] = "Pigma Dengar",
+
+		["Wolf_Assault"] = "Wolf O'Donnell",
+		["Leon_Assault"] = "Leon Powalski",
+		["Panther_Assault"] = "Panther Caroso",
+	}
 end
 
 SF_MUS = {}
@@ -34,12 +55,17 @@ SF_AI_UNIQUE = {
 	["Krystal"] = NULL,
 	["Bill"] = NULL,
 	["Dash"] = NULL,
+	["James"] = NULL,
+	["Katt"] = NULL,
 
 	["Wolf"] = NULL,
 	["Leon"] = NULL,
 	["Andrew"] = NULL,
 	["Pigma"] = NULL,
-	["Panther"] = NULL,
+
+	["Wolf_Assault"] = NULL,
+	["Leon_Assault"] = NULL,
+	["Panther_Assault"] = NULL,
 }
 
 local PLY = FindMetaTable("Player")

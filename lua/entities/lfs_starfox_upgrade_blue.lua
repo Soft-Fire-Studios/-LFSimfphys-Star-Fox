@@ -66,7 +66,7 @@ function ENT:Think()
 	self:NextThink(CurTime())
 	if self.Dead then return end
 	for _,v in ipairs(ents.FindInSphere(self:GetPos(),self:OBBMaxs().z *2)) do
-		if v != self && string.find(v:GetClass(),"lfs_starfox_") && v.AITEAM && !v.SF_BlockUpgrade then
+		if v != self && string.find(v:GetClass(),"lfs_starfox_") && v.AITEAM && !v.SF_BlockUpgrade && !v.Destroyed then
 			self.Dead = true
 			self:DoUpgrade(v)
 			self:Remove()

@@ -2,67 +2,68 @@
 
 include("shared.lua")
 
-ENT.Lines["Wolf"] = {
-	"cpthazama/starfox/vo/wolf/Wolfgoing down.mp3",
-	"cpthazama/starfox/vo/wolf/WolfPlaytimes over.mp3",
-	"cpthazama/starfox/vo/wolf/Wolfis that all.mp3",
-	"cpthazama/starfox/vo/wolf/Wolfwhat the heck.mp3",
-	"cpthazama/starfox/vo/wolf/Wolfyoull be seeing your dad.mp3",
-	"cpthazama/starfox/vo/wolf/Wolfyoure not so tough.mp3",
-	"cpthazama/starfox/vo/wolf/WollfCant let you do that.mp3",
-	"cpthazama/starfox/vo/wolf/WollfDont get too cocky.mp3",
-	"cpthazama/starfox/vo/wolf/WolfPlaytimes over.mp3",
-	"cpthazama/starfox/vo/wolf/Wolfyoure good im better.mp3",
+ENT.Lines["Wolf_Assault"] = {
+	"cpthazama/starfox/vo/wolf_assault/aint_your_father.wav",
+	"cpthazama/starfox/vo/wolf_assault/amaetures.wav",
+	"cpthazama/starfox/vo/wolf_assault/dance_partner.wav",
+	"cpthazama/starfox/vo/wolf_assault/done_already.wav",
+	"cpthazama/starfox/vo/wolf_assault/dropped_in_unannounced.wav",
+	"cpthazama/starfox/vo/wolf_assault/fools.wav",
+	"cpthazama/starfox/vo/wolf_assault/go_down.wav",
+	"cpthazama/starfox/vo/wolf_assault/got_questions.wav",
+	"cpthazama/starfox/vo/wolf_assault/gotten_soft.wav",
+	"cpthazama/starfox/vo/wolf_assault/idiots_up_to.wav",
+	"cpthazama/starfox/vo/wolf_assault/lets_do_this.wav",
+	"cpthazama/starfox/vo/wolf_assault/my_turf.wav",
+	"cpthazama/starfox/vo/wolf_assault/not_done_yet.wav",
+	"cpthazama/starfox/vo/wolf_assault/pay_attention.wav",
+	"cpthazama/starfox/vo/wolf_assault/pigma_apology.wav",
+	"cpthazama/starfox/vo/wolf_assault/pitiful_sight.wav",
+	"cpthazama/starfox/vo/wolf_assault/settle_this.wav",
+	"cpthazama/starfox/vo/wolf_assault/star_wolf_will_take_you_down.wav",
+	"cpthazama/starfox/vo/wolf_assault/stupid_look.wav",
+	"cpthazama/starfox/vo/wolf_assault/talk_too_much.wav",
 }
-ENT.Lines["Andrew"] = {
-	"cpthazama/starfox/vo/andrew/Andrew Andross enemy.mp3",
-	"cpthazama/starfox/vo/andrew/AndrewIm not afraid.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewbow before the great andross.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewgive it up.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewscore one for andross.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewstick to the pond.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewwell make sure.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewyoull be sorry.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewyoure not welcome.mp3",
+ENT.Lines["Panther_Assault"] = {
+	"cpthazama/starfox/vo/panther_assault/favorite_cafe.wav",
+	"cpthazama/starfox/vo/panther_assault/first_class_meal.wav",
+	"cpthazama/starfox/vo/panther_assault/good_as_i_heard.wav",
+	"cpthazama/starfox/vo/panther_assault/grand_finale.wav",
+	"cpthazama/starfox/vo/panther_assault/introduction.wav",
+	"cpthazama/starfox/vo/panther_assault/make_me_mad.wav",
+	"cpthazama/starfox/vo/panther_assault/no_time_for_pleas.wav",
+	"cpthazama/starfox/vo/panther_assault/where_you_looking.wav",
+	"cpthazama/starfox/vo/panther_assault/you_looking_to_die.wav",
+	"cpthazama/starfox/vo/panther_assault/youre_doing_okay.wav",
+	"cpthazama/starfox/vo/panther_assault/youre_looking_good.wav",
 }
-ENT.Lines["Leon"] = {
-	"cpthazama/starfox/vo/leon/LeonI think Ill torture you.mp3",
-	"cpthazama/starfox/vo/leon/LeonIll take care of you.mp3",
-	"cpthazama/starfox/vo/leon/Leonandross ordered us.mp3",
-	"cpthazama/starfox/vo/leon/Leonannoying bird.mp3",
-	"cpthazama/starfox/vo/leon/Leonclose but no cigar.mp3",
-	"cpthazama/starfox/vo/leon/Leonnew ships.mp3",
-	"cpthazama/starfox/vo/leon/Leonnot as bad as I thought.mp3",
-	"cpthazama/starfox/vo/leon/Leonnot yet.mp3",
-	"cpthazama/starfox/vo/leon/Leonshoot me down.mp3",
+ENT.Lines["Leon_Assault"] = {
+	"cpthazama/starfox/vo/leon_assault/all_you_got.wav",
+	"cpthazama/starfox/vo/leon_assault/cocky_as_ever.wav",
+	"cpthazama/starfox/vo/leon_assault/cook_torment.wav",
+	"cpthazama/starfox/vo/leon_assault/day_to_fight_you.wav",
+	"cpthazama/starfox/vo/leon_assault/end_up_as_target.wav",
+	"cpthazama/starfox/vo/leon_assault/not_showing_weakness.wav",
+	"cpthazama/starfox/vo/leon_assault/say_the_wor.wav",
+	"cpthazama/starfox/vo/leon_assault/so_easy.wav",
+	"cpthazama/starfox/vo/leon_assault/surprised_you_got_far.wav",
+	"cpthazama/starfox/vo/leon_assault/think_i_am.wav",
+	"cpthazama/starfox/vo/leon_assault/too_weak.wav",
+	"cpthazama/starfox/vo/leon_assault/wise_guy.wav",
+	"cpthazama/starfox/vo/leon_assault/youre_in_the_way.wav",
 }
-ENT.Lines["Pigma"] = {
-	"cpthazama/starfox/vo/pigma/PigmaIll do you fast.mp3",
-	"cpthazama/starfox/vo/pigma/PigmaIm gonna bust you up.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmacome on little man.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmadaddy screamed.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmapeppy long time.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmathat reward.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmatoo bad dads not here.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmatwo words.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmawere getting paid.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmayou cant beat me.mp3",
+ENT.LinesDeath["Wolf_Assault"] = {
+	"cpthazama/starfox/vo/wolf_assault/cant_believe_beat.wav",
+	"cpthazama/starfox/vo/wolf_assault/death1.wav",
+	"cpthazama/starfox/vo/wolf_assault/death2.wav",
+	"cpthazama/starfox/vo/wolf_assault/thats_enough.wav",
+	"cpthazama/starfox/vo/wolf_assault/thats_the_end.wav",
 }
-ENT.LinesDeath["Wolf"] = {
-	"cpthazama/starfox/vo/wolf/Wolfno way.mp3",
-	"cpthazama/starfox/vo/wolf/WollfI cant lose.mp3"
+ENT.LinesDeath["Panther_Assault"] = {
+	"cpthazama/starfox/vo/panther_assault/death1.wav",
 }
-ENT.LinesDeath["Andrew"] = {
-	"cpthazama/starfox/vo/andrew/Andrew aah.mp3",
-	"cpthazama/starfox/vo/andrew/Andrewuncle andross.mp3",
-}
-ENT.LinesDeath["Leon"] = {
-	"cpthazama/starfox/vo/leon/Leonthis cant be happening.mp3",
-	"cpthazama/starfox/vo/leon/Leontoo strong.mp3",
-}
-ENT.LinesDeath["Pigma"] = {
-	"cpthazama/starfox/vo/pigma/Pigmabeautiful reward.mp3",
-	"cpthazama/starfox/vo/pigma/Pigmathis cant be happening.mp3",
+ENT.LinesDeath["Leon_Assault"] = {
+	"cpthazama/starfox/vo/leon_assault/death1.wav",
 }
 
 function ENT:Think()

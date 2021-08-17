@@ -7,7 +7,7 @@ ENT.Author 			= "Cpt. Hazama"
 ENT.Contact 		= ""
 ENT.Purpose 		= ""
 ENT.Instructions 	= ""
-ENT.Category 		= "[LFS] Star Fox"
+ENT.Category 		= "[LFS] Star Fox - Entities"
 
 ENT.Spawnable = true
 ENT.AdminOnly = true
@@ -18,7 +18,8 @@ if CLIENT then
 	end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 	function ENT:Initialize()
-		SF_CreateTrack("cpthazama/starfox/music/star_wolf.mp3",LocalPlayer(),"Star Wolf")
+		local assault = self:GetNW2Bool("IsAssault")
+		SF_CreateTrack(assault && "cpthazama/starfox/music/star_wolf_assault.mp3" or "cpthazama/starfox/music/star_wolf.mp3",LocalPlayer(),"Star Wolf")
 	end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 	function ENT:OnRemove()
@@ -29,6 +30,8 @@ end
 if !SERVER then return end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:Initialize()
+	self:SetNW2Bool("IsAssault",math.random(1,2) == 1)
+	local assault = self:GetNW2Bool("IsAssault")
 	self:SetModel("models/props_junk/sawblade001a.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_NONE)
@@ -49,8 +52,8 @@ function ENT:Initialize()
 
 	self.Squad = {}
 
-	local ent = VJ_PICK({"lfs_starfox_wolfen","lfs_starfox_wolfen_zero"})
-	for i = 1,4 do
+	local ent = assault && "lfs_starfox_wolfen" or "lfs_starfox_wolfen_zero"
+	for i = 1,assault && 3 or 4 do
 		local tbl = self.Squad
 		table.insert(tbl,self)
 

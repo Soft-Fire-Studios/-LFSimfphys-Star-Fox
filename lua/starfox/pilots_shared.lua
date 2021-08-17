@@ -62,7 +62,7 @@ hook.Add("HUDPaint","StarFox_AI",function()
 		surface.SetFont("CloseCaption_Bold")
 		surface.SetTextColor(0,255,42)
 		surface.SetTextPos((tX +scale *4.75) *0.5,tY +scale *0.1)
-		surface.DrawText(ply.SF_CurrentVO)
+		surface.DrawText(SF_AI_TRANSLATE[ply.SF_CurrentVO] or ply.SF_CurrentVO)
 
 		if boxText then
 			surface.SetFont("CloseCaption_Bold")
@@ -109,16 +109,17 @@ function ENT:DoVOSound()
 		local plyTeam = ply:lfsGetAITeam()
 		local team = self:GetNW2Int("Team")
 		if self:GetAI() && team != plyTeam then
-			local vehicle = ply:lfsGetPlane()
-			if !IsValid(vehicle) then continue end
+			-- local vehicle = ply:lfsGetPlane()
+			-- if !IsValid(vehicle) then continue end
 			local VO = self:GetNW2String("VO")
 			if !VO then continue end
-			self.SF_NextTalkT = self.SF_NextTalkT or CurTime() +math.Rand(5,60)
+			self.SF_NextTalkT = self.SF_NextTalkT or CurTime() +math.Rand(5,10)
 			ply.SF_NextTalkT = ply.SF_NextTalkT or 0
 			ply.SF_TalkT = ply.SF_TalkT or 0
 			ply.SF_TalkTexture = ply.SF_TalkTexture or nil
 			if CurTime() > self.SF_NextTalkT && CurTime() > ply.SF_NextTalkT && math.random(1,100) < 30 then
 				local snddur = SF.PlayVO(ply,SF.GetVOLine(self,VO),VO)
+				if snddur == nil then continue end
 				ply.SF_CurrentVOEntity = self
 				self.SF_NextTalkT = CurTime() +snddur +math.Rand(15,40)
 			end

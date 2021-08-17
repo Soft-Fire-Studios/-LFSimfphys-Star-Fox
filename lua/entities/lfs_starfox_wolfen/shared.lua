@@ -12,6 +12,8 @@ ENT.Category = "[LFS] Star Fox"
 ENT.Spawnable		= true
 ENT.AdminSpawnable  = false
 
+ENT.Pilots = {"Wolf_Assault","Leon_Assault","Panther_Assault"}
+
 ENT.MDL = "models/cpthazama/starfox/vehicles/wolfen.mdl"
 
 ENT.AITEAM = 2
@@ -27,7 +29,7 @@ ENT.SeatPos = Vector(50,0,32)
 ENT.SeatAng = Angle(0,-90,0)
 
 ENT.WheelMass 		= 	325 -- wheel mass is 1 when the landing gear is retracted
-ENT.WheelRadius 	= 	50
+ENT.WheelRadius 	= 	60
 ENT.WheelPos_L 		= 	Vector(0,-120,-180)
 ENT.WheelPos_R 		= 	Vector(0,120,-180)
 ENT.WheelPos_C   	= 	Vector(150,0,-180)
