@@ -1,0 +1,17 @@
+"UnlitGeneric"
+{
+	"$basetexture" "effects/starfox/shield_aparoid"
+	"$nodecal" "1"
+	"$model" "1"
+	"$additive" "1"
+	"$nocull" "1"
+	"Proxies"
+	{
+		"TextureScroll"
+		{
+			"texturescrollvar" "$basetexturetransform"
+			"texturescrollrate" 0.25
+			"texturescrollangle" 60
+		}
+	}
+}

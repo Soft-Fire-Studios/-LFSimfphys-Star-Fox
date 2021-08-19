@@ -1,6 +1,4 @@
---DO NOT EDIT OR REUPLOAD THIS FILE
-
-EFFECT.Mat = Material( "particles/starfox/tracer/angler_cap" )
+EFFECT.Mat = Material( "particles/starfox/tracer/aparoid_cap" )
 EFFECT.Mat2 = Material( "sprites/light_glow02_add" )
 
 local Materials = {
@@ -54,7 +52,7 @@ function EFFECT:Init( data )
 			particle:SetStartSize( math.max( math.random(10,24) - i * 0.5,0.1 ) * Size )
 			particle:SetEndSize( 0 )
 			particle:SetRoll( math.Rand( -1, 1 ) )
-			particle:SetColor( 140,0,255 )
+			particle:SetColor( 31,153,0 )
 			particle:SetCollide( false )
 		end
 		
@@ -74,7 +72,7 @@ function EFFECT:Init( data )
 			particle:SetStartSize( 2 )
 			particle:SetEndSize( math.Rand(5,10) )
 			particle:SetRoll( math.Rand(-1,1) )
-			particle:SetColor( 140,0,255 )
+			particle:SetColor( rCol,rCol,rCol )
 			particle:SetGravity( VectorRand() * 200 + Vector(0,0,200) )
 			particle:SetCollide( false )
 		end
@@ -88,7 +86,7 @@ function EFFECT:Think()
 
 	if CurTime() > self.DieTime then
 		local effectdata = EffectData()
-			effectdata:SetStart( Vector(140,0,255) ) 
+			effectdata:SetStart( Vector(31,153,0) ) 
 			effectdata:SetOrigin( self.EndPos )
 			effectdata:SetNormal( self.Dir:GetNormalized() )
 		util.Effect( "lfs_laser_hit", effectdata )
@@ -112,11 +110,11 @@ function EFFECT:Render()
 	render.SetMaterial( self.Mat )
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
-		100, 1, 0, Color(140,0,255) )
+		50, 1, 0, Color(255,255,255) )
 		
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
-		40, 1, 0, Color(255,255,255,255) )
+		50, 1, 0, Color(255,255,255,255) )
 		
 	--render.SetMaterial( self.Mat2 ) 
 	--render.DrawSprite( Pos1, 80, 80, Color(0,255,0,255) ) 

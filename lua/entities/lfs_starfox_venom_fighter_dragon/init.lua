@@ -4,11 +4,13 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
 
+ENT.Mirror = 1
+
 function ENT:SpawnFunction( ply, tr, ClassName )
 	if not tr.Hit then return end
 
 	local ent = ents.Create(ClassName)
-	ent:SetPos(tr.HitPos + tr.HitNormal * 180)
+	ent:SetPos(tr.HitPos)
 	local ang = ply:EyeAngles()
 	ent:SetAngles(Angle(0,ang.y +180,0))
 	ent:Spawn()
@@ -17,32 +19,29 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 	return ent
 end
 
-function ENT:RunOnSpawn()
-
-end
-
 function ENT:OnRemove()
-	SafeRemoveEntity(self.Trail)
+	SafeRemoveEntity(self.Trail1)
+	SafeRemoveEntity(self.Trail2)
 end
 
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 
-	self:SetNextPrimary(0.25)
+	self:SetNextPrimary(0.2)
 
-	local upgrade = SF.GetLaser(self,"lfs_sf_laser_green")
+	local upgrade = SF.GetLaser(self,"lfs_sf_laser_red")
 
-	local target = self:GetAI() && SF.FindEnemy(self) -- This vehicle has Multi-Target capabilities
+	self.Mirror = self.Mirror == 1 && 2 or 1
 	local bullet = {}
 	bullet.Num 		= 1
-	bullet.Src 		= self:GetAttachment(1).Pos
-	bullet.Dir 		= IsValid(target) && (target:GetPos() -bullet.Src):Angle():Forward() or self:LocalToWorldAngles(Angle(0,0,0)):Forward()
+	bullet.Src 		= self:GetAttachment(self.Mirror).Pos
+	bullet.Dir 		= self:LocalToWorldAngles(Angle(0,0,0)):Forward()
 	bullet.Spread 	= Vector(0.01,0.01,0)
 	bullet.Tracer	= 1
 	bullet.TracerName = upgrade.Effect
 	bullet.Force	= 100
 	bullet.HullSize = 25
-	bullet.Damage	= 30 *upgrade.DMG
+	bullet.Damage	= 20 *upgrade.DMG
 	bullet.Attacker = self:GetDriver()
 	bullet.AmmoType = "Pistol"
 	bullet.Callback = function(att,tr,dmginfo)
@@ -71,10 +70,12 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	local MaxRPM = self:GetMaxRPM()
 
 	if RPM <= MaxRPM *0.05 then
-		SafeRemoveEntity(self.Trail)
-	elseif self.CanUseTrail && !IsValid(self.Trail) && RPM > MaxRPM *0.05 then
-		local size = 1000
-		self.Trail = util.SpriteTrail(self, 4, Color(192,153,255), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
+		SafeRemoveEntity(self.Trail1)
+		SafeRemoveEntity(self.Trail2)
+	elseif self.CanUseTrail && !IsValid(self.Trail1) && !IsValid(self.Trail2) && RPM > MaxRPM *0.05 then
+		local size = 400
+		self.Trail1 = util.SpriteTrail(self, 3, Color(240,38,31), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
+		self.Trail2 = util.SpriteTrail(self, 4, Color(240,38,31), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
 	end
 	local Driver = self:GetDriver()
 	
@@ -102,7 +103,8 @@ function ENT:OnEngineStopped()
 	self:EmitSound("cpthazama/starfox/vehicles/arwing_power_down.wav")
 
 	self.CanUseTrail = false
-	SafeRemoveEntity(self.Trail)
+	SafeRemoveEntity(self.Trail1)
+	SafeRemoveEntity(self.Trail2)
 end
 
 function ENT:Destroy()
@@ -114,7 +116,7 @@ function ENT:AIGetTarget()
 	return SF.FindEnemy(self)
 end
 
-ENT.ShieldEffect = "lfs_sf_shield_aparoid"
+ENT.ShieldEffect = "lfs_sf_shield_corneria"
 function ENT:OnTakeDamage(dmginfo)
 	SF.OnTakeDamage(self,dmginfo)
 end

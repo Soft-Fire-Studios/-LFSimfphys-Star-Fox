@@ -1,6 +1,4 @@
---DO NOT EDIT OR REUPLOAD THIS FILE
-
-EFFECT.Mat = Material( "effects/spark" )
+EFFECT.Mat = Material( "particles/starfox/tracer/corneria_cap" )
 EFFECT.Mat2 = Material( "sprites/light_glow02_add" )
 
 local Materials = {
@@ -32,7 +30,7 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	self.TracerTime = math.min( 1, self.StartPos:Distance( self.EndPos ) / 15000 ) * 0.5
-	self.Length = math.Rand( 0.3, 0.35 )
+	self.Length = math.Rand( 0.4, 0.45 )
 
 	-- Die when it reaches its target
 	self.DieTime = CurTime() + self.TracerTime
@@ -45,16 +43,16 @@ function EFFECT:Init( data )
 		local Pos = self.StartPos + Dir * i * 0.7 * math.random(1,2) * 0.5
 		
 		local particle = emitter:Add( "effects/muzzleflash2", Pos )
-		local Size = 8
+		local Size = 2
 		
 		if particle then
 			particle:SetVelocity( Dir * 800 )
 			particle:SetDieTime( 0.05 )
 			particle:SetStartAlpha( 255 * Size )
-			particle:SetStartSize( math.max( math.random(20,48) - i * 0.5,0.1 ) * Size )
+			particle:SetStartSize( math.max( math.random(10,24) - i * 0.5,0.1 ) * Size )
 			particle:SetEndSize( 0 )
 			particle:SetRoll( math.Rand( -1, 1 ) )
-			particle:SetColor( 255,0,0 )
+			particle:SetColor( 0,0,255 )
 			particle:SetCollide( false )
 		end
 		
@@ -71,8 +69,8 @@ function EFFECT:Init( data )
 			particle:SetDieTime( math.Rand(0.05,0.2) )
 			particle:SetAirResistance( math.Rand(50,100) ) 
 			particle:SetStartAlpha( 20 )
-			particle:SetStartSize( 4 )
-			particle:SetEndSize( math.Rand(10,20) )
+			particle:SetStartSize( 2 )
+			particle:SetEndSize( math.Rand(5,10) )
 			particle:SetRoll( math.Rand(-1,1) )
 			particle:SetColor( rCol,rCol,rCol )
 			particle:SetGravity( VectorRand() * 200 + Vector(0,0,200) )
@@ -88,7 +86,7 @@ function EFFECT:Think()
 
 	if CurTime() > self.DieTime then
 		local effectdata = EffectData()
-			effectdata:SetStart( Vector(255,50,50) ) 
+			effectdata:SetStart( Vector(50,80,255) ) 
 			effectdata:SetOrigin( self.EndPos )
 			effectdata:SetNormal( self.Dir:GetNormalized() )
 		util.Effect( "lfs_laser_hit", effectdata )
@@ -103,21 +101,20 @@ end
 function EFFECT:Render()
 
 	local fDelta = ( self.DieTime - CurTime() ) / self.TracerTime
-	fDelta = math.Clamp( fDelta, 0, 1 ) ^ 2
+	fDelta = math.Clamp( fDelta, 0, 1 ) ^ 2 -- lasers are faster than bullets...
 
 	local sinWave = math.sin( fDelta * math.pi )
 	
 	local Pos1 = self.EndPos - self.Dir * ( fDelta - sinWave * self.Length )
-	local Size = 700
 	
 	render.SetMaterial( self.Mat )
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
-		Size, 1, 0, Color(255,0,0,255) )
+		150, 1, 0, Color(124,124,255) )
 		
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
-		Size *0.46, 1, 0, Color(255,255,255,255) )
+		50, 1, 0, Color(255,255,255,255) )
 		
 	--render.SetMaterial( self.Mat2 ) 
 	--render.DrawSprite( Pos1, 80, 80, Color(0,255,0,255) ) 

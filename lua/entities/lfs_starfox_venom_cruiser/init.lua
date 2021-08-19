@@ -31,7 +31,14 @@ function ENT:RunOnSpawn()
 	self:DeleteOnRemove(ramp)
 	self.Ramp = ramp
 
+	self.TurretData = self.TurretData or {}
+
 	for i = 1,12 do
+		self.TurretData[i] = self.TurretData[i] or {}
+		self.TurretData[i].Heat = self.TurretData[i].Heat or 0
+		self.TurretData[i].HeatT = self.TurretData[i].HeatT or 0
+		self.TurretData[i].HeatAIWaitT = self.TurretData[i].HeatAIWaitT or 0
+
 		SF.AddAI("Turret_" .. i,self,i)
 	end
 end
@@ -66,6 +73,12 @@ function ENT:FireTurret(num,targetPos)
 		-- filter = self
 	})
 
+	local heat = self.TurretData[num].Heat
+	local heatT = self.TurretData[num].HeatT
+	local heatAIWaitT = self.TurretData[num].HeatAIWaitT
+
+	if heat >= 1000 then return end
+	if hasAI && CurTime() < heatAIWaitT then return end
 	if trace.Entity && trace.Entity == self then return end
 
 	local bullet = {}
@@ -87,6 +100,9 @@ function ENT:FireTurret(num,targetPos)
 	sound.Play("ambient/energy/weld1.wav",startpos,75,80,1)
 	self:FireBullets(bullet)
 	self:TakePrimaryAmmo()
+
+	self.TurretData[num].Heat = self.TurretData[num].Heat +1
+	self.TurretData[num].HeatT = CurTime() +10
 end
 
 function ENT:CreateAI()
@@ -113,6 +129,20 @@ function ENT:IsEngineStartAllowed()
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
+	for i = 1,12 do
+		local heat = self.TurretData[i].Heat
+		local heatT = self.TurretData[i].HeatT
+		local heatAIWaitT = self.TurretData[i].HeatAIWaitT
+		self.TurretData[i].Heat = self.TurretData[i].Heat or 0
+		self.TurretData[i].HeatT = self.TurretData[i].HeatT or 0
+		if heat > 750 && math.random(1,20) == 1 && CurTime() > heatAIWaitT then
+			self.TurretData[i].HeatAIWaitT = CurTime() +math.Rand(3,15)
+		end
+		if CurTime() > heatT && heat > 0 then
+			self.TurretData[i].Heat = heat -1
+		end
+	end
+
 	local Driver = self:GetDriver()
 	if IsValid(Driver) then
 		if self:GetAmmoPrimary() > 0 then

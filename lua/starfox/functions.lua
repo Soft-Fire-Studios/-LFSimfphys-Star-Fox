@@ -52,7 +52,7 @@ SF.PaintInfoLine = function(self,HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREEL
 	end
 end
 
-SF.GetLaser = function(ent,tr)
+SF.GetLaser = function(ent,tr,repTr1,repTr2)
 	if !IsValid(ent) then return end
 	local time = ent:GetNW2Int("LaserUpgradeTime") or 0
 	local upgrade = ent:GetNW2Int("LaserUpgrade") or 0
@@ -61,7 +61,7 @@ SF.GetLaser = function(ent,tr)
 	end
 	local tbl = {}
 	tbl.DMG = upgrade == 2 && 2 or upgrade == 1 && 1.5 or 1
-	tbl.Effect = upgrade == 2 && (tr == "lfs_laser_red" && "lfs_sf_laser_purple" or "lfs_laser_red_large") or upgrade == 1 && "lfs_laser_blue" or tr
+	tbl.Effect = upgrade == 2 && (repTr2 or (tr == "lfs_sf_laser_red" && "lfs_sf_laser_purple" or "lfs_sf_laser_red")) or upgrade == 1 && (repTr1 or "lfs_sf_laser_blue") or tr
 	tbl.Level = upgrade
 	tbl.Time = time -CurTime()
 
@@ -240,6 +240,8 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 	end
 	if funcPost then funcPost(ent) end
 
+	constraint.NoCollide(ent,self,0,0)
+
 	if !lockOn then return end
 	if self:GetAI() then
 		local enemy = SF.FindEnemy(self)
@@ -260,7 +262,6 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 			end
 		end
 	end
-	constraint.NoCollide(ent,self,0,0)
 end
 
 SF.ForceVOSound = function(ply,self,snd,VO)
@@ -338,6 +339,82 @@ SF.OnDestroyed = function(self,spawnChance)
 		timer.Simple(30,function()
 			SafeRemoveEntity(item)
 		end)
+	end
+end
+
+SF.OnTakeDamage = function(self,dmginfo)
+	self:TakePhysicsDamage( dmginfo )
+
+	self:StopMaintenance()
+
+	local Damage = dmginfo:GetDamage()
+	local CurHealth = self:GetHP()
+	local NewHealth = math.Clamp( CurHealth - Damage , -self:GetMaxHP(), self:GetMaxHP() )
+	local ShieldCanBlock = dmginfo:IsBulletDamage() or dmginfo:IsDamageType( DMG_AIRBOAT )
+
+	if ShieldCanBlock then
+		local dmgNormal = -dmginfo:GetDamageForce():GetNormalized() 
+		local dmgPos = dmginfo:GetDamagePosition()
+
+		self:SetNextShieldRecharge( 3 )
+
+		if self:GetMaxShield() > 0 and self:GetShield() > 0 then
+			dmginfo:SetDamagePosition( dmgPos + dmgNormal * 250 * self:GetShieldPercent() )
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( dmginfo:GetDamagePosition() )
+				effectdata:SetEntity( self )
+			util.Effect(self.ShieldEffect or "lfs_sf_shield_corneria", effectdata )
+
+			self:TakeShieldDamage( Damage )
+		else
+			sound.Play( Sound( table.Random( {"physics/metal/metal_sheet_impact_bullet2.wav","physics/metal/metal_sheet_impact_hard2.wav","physics/metal/metal_sheet_impact_hard6.wav",} ) ), dmgPos, SNDLVL_70dB)
+	
+			local effectdata = EffectData()
+				effectdata:SetOrigin( dmgPos )
+				effectdata:SetNormal( dmgNormal )
+			util.Effect( "MetalSpark", effectdata )
+			
+			self:SetHP( NewHealth )
+		end
+	else
+		self:SetHP( NewHealth )
+	end
+
+	SF.OnDamage(self,dmginfo)
+	
+	if NewHealth <= 0 and not (self:GetShield() > Damage and ShieldCanBlock) then
+		if not self:IsDestroyed() then
+			self.FinalAttacker = dmginfo:GetAttacker() 
+			self.FinalInflictor = dmginfo:GetInflictor()
+
+			self:Destroy()
+			
+			self.MaxPerfVelocity = self.MaxPerfVelocity * 10
+			local ExplodeTime = self:IsSpaceShip() and (math.Clamp((self:GetVelocity():Length() - 250) / 500,1.5,8) * math.Rand(0.2,1)) or (self:GetAI() and 30 or 9999)
+			if self:IsGunship() then ExplodeTime = math.Rand(1,2) end
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( self:GetPos() )
+			util.Effect( "lfs_explosion_nodebris", effectdata )
+
+			local effectdata = EffectData()
+				effectdata:SetOrigin( self:GetPos() )
+				effectdata:SetStart( self:GetPhysicsObject():GetMassCenter() )
+				effectdata:SetEntity( self )
+				effectdata:SetScale( 1 )
+				effectdata:SetMagnitude( ExplodeTime )
+			util.Effect( "lfs_firetrail", effectdata )
+
+			timer.Simple( ExplodeTime, function()
+				if not IsValid( self ) then return end
+				self:Explode()
+			end)
+		end
+	end
+
+	if NewHealth <= -self:GetMaxHP() then
+		self:Explode()
 	end
 end
 

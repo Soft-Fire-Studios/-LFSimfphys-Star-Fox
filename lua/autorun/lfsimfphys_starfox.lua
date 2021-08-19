@@ -2,6 +2,8 @@ print("Loading [LFSimfphys] Star Fox Autorun file...")
 
 CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"If enabled, only enemy VO will appear on your screen")
 CreateConVar("lfs_sf_cameraspeed",3,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Update speed of the third person camera")
+CreateConVar("lfs_sf_mission_allies",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the spawning of allies in missions")
+CreateConVar("lfs_sf_mission_forceply",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the forcing of players into vehicles during missions")
 
 SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2
@@ -14,6 +16,7 @@ if CLIENT then
 		["lfs_starfox_venom_bomber"] = "Venomian Stealth Bomber",
 		["lfs_starfox_venom_cruiser"] = "Venomian Cruiser Mk. II",
 		["lfs_starfox_venom_fighter"] = "Venomian Figher Mk. II",
+		["lfs_starfox_venom_fighter_dragon"] = "Venomian Figher Mk. I",
 		["lfs_starfox_wolfen"] = "Wolfen Mk. II",
 		["lfs_starfox_wolfen_zero"] = "Wolfen Mk. I",
 		["lfs_starfox_wolfen_ii"] = "Wolfen II (64)",
@@ -92,17 +95,54 @@ function PLY:lfsSetAITeam(iTeam)
 end
 
 if CLIENT then
-function SF_CreateTrack(song,ply,ID)
+function SF_CreateTrack(song,ply,ID,noplay)
 	if song == false or song == nil then return end
 	sound.PlayFile("sound/" .. song,"noplay noblock",function(soundchannel,errorID,errorName)
 		if IsValid(soundchannel) then
-			soundchannel:Play()
+			if noplay != true then
+				soundchannel:Play()
+			end
 			soundchannel:EnableLooping(true)
 			soundchannel:SetVolume(0.8)
 			soundchannel:SetPlaybackRate(1)
+			for k,v in pairs(SF_MUS) do
+				if v && !IsValid(v.Channel) then
+					table.remove(v,k)
+				end
+			end
 			table.insert(SF_MUS,{ID=ID,Channel=soundchannel})
 		end
 	end)
+end
+
+function SF_PlayTrack(track,isID)
+	if isID then
+		for _,v in SortedPairs(SF_MUS) do
+			if v && IsValid(v.Channel) && v.ID == track then
+				v.Channel:Play()
+				break
+			end
+		end
+		return
+	end
+	if IsValid(track) then
+		track:Play()
+	end
+end
+
+function SF_PauseTrack(track,isID)
+	if isID then
+		for _,v in SortedPairs(SF_MUS) do
+			if v && IsValid(v.Channel) && v.ID == track then
+				v.Channel:Pause()
+				break
+			end
+		end
+		return
+	end
+	if IsValid(track) then
+		track:Pause()
+	end
 end
 
 function SF_StopTrack(track,isID)

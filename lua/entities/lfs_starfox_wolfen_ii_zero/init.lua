@@ -47,7 +47,7 @@ function ENT:PrimaryAttack()
 	self:SetNextPrimary(0.1)
 	-- self:SetNextPrimary(0.15)
 
-	local upgrade = SF.GetLaser(self,"lfs_laser_red")
+	local upgrade = SF.GetLaser(self,"lfs_sf_laser_red")
 
 	local target = self:GetAI() && SF.FindEnemy(self) -- This vehicle has Multi-Target capabilities
 	for i = 1,2 do		

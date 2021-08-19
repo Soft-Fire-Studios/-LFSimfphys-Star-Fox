@@ -68,7 +68,7 @@ function ENT:PrimaryAttack(isCharged)
 			self:SetChargeT(0)
 			self.CanChargeT = CurTime() +2
 	else
-		local upgrade = SF.GetLaser(self,"lfs_laser_green")
+		local upgrade = SF.GetLaser(self,"lfs_sf_laser_green")
 		for i = 0,1 do
 			self.MirrorPrimary = not self.MirrorPrimary
 			

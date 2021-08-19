@@ -1,6 +1,6 @@
 --DO NOT EDIT OR REUPLOAD THIS FILE
 
-EFFECT.Mat = Material( "effects/spark" )
+EFFECT.Mat = Material( "particles/starfox/tracer/angler_cap" )
 EFFECT.Mat2 = Material( "sprites/light_glow02_add" )
 
 local Materials = {
@@ -112,7 +112,7 @@ function EFFECT:Render()
 	render.SetMaterial( self.Mat )
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
-		45, 1, 0, Color(255,174,0) )
+		120, 1, 0, Color(255,208,0) )
 		
 	render.DrawBeam( Pos1,
 		self.EndPos - self.Dir * ( fDelta + sinWave * self.Length ),
