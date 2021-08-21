@@ -4,6 +4,12 @@ CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NO
 CreateConVar("lfs_sf_cameraspeed",3,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Update speed of the third person camera")
 CreateConVar("lfs_sf_mission_allies",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the spawning of allies in missions")
 CreateConVar("lfs_sf_mission_forceply",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the forcing of players into vehicles during missions")
+CreateClientConVar("lfs_sf_ship","arwing",true,true)
+
+include("starfox/customization.lua")
+
+SF_C.CreateDir("customization")
+SF_C.CreateDir("factions")
 
 SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2

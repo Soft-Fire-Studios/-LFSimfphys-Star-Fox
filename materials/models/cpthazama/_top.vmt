@@ -1,0 +1,7 @@
+"UnLitGeneric"
+{
+	"$baseTexture" "models/cpthazama/_top"
+
+	"$nodecal" "1"
+	"$lightwarptexture"				"models/cpthazama/starfox/warp2"
+}

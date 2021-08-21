@@ -9,8 +9,8 @@ SWEP.Instructions				= "Controls are like a regular weapon."
 SWEP.Category					= "Star Fox"
 
 SWEP.WorldModel_UseCustomPosition = true -- Should the gun use custom position? This can be used to fix guns that are in the crotch
-SWEP.WorldModel_CustomPositionAngle = Vector(0, 0, 180)
-SWEP.WorldModel_CustomPositionOrigin = Vector(0, 3, 0)
+SWEP.WorldModel_CustomPositionAngle = Vector(-10, 0, 180)
+SWEP.WorldModel_CustomPositionOrigin = Vector(0, 4, -1)
 
 	-- Client Settings ---------------------------------------------------------------------------------------------------------------------------------------------
 if CLIENT then

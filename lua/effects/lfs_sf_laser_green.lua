@@ -23,9 +23,25 @@ local Materials = {
 }
 
 function EFFECT:Init( data )
-
 	self.StartPos = data:GetStart()
 	self.EndPos = data:GetOrigin()
+
+	local ent = data:GetEntity()
+	local att = data:GetAttachment()
+
+	if IsValid(ent) && ent:IsWeapon() then
+		local owner = ent:GetOwner()
+		if IsValid(owner) && owner:IsPlayer() then
+			local viewModel = owner:GetViewModel()
+			if IsValid(viewModel) && !LocalPlayer():ShouldDrawLocalPlayer() then
+				ent = viewModel
+			end
+			att = ent:GetAttachment(att)
+			if (att) then
+				self.StartPos = att.Pos
+			end
+		end
+	end
 	
 	self.Dir = self.EndPos - self.StartPos
 

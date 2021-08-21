@@ -32,6 +32,8 @@ ENT.Instructions 	= ""
 ENT.Category 		= "[LFS] Star Fox - Missions"
 
 ENT.MissionType = 0 -- 0 = None, 1 = Assault, 2 = War Zone, 3 = Escort, 4 = Versus
+ENT.MissionForceTeam = false
+ENT.MissionTeam = SF_AI_TEAM_CORNERIA
 
 ENT.Spawnable = false
 ENT.AdminOnly = false
@@ -143,6 +145,9 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:Think()
 	self:SetPos(VJ_PICK(player.GetAll()):GetPos())
+	if self.MissionForceTeam then
+		for _,v in pairs(player.GetAll()) do v:lfsSetAITeam(self.MissionTeam) end
+	end
 	self:MissionThink(self.MissionType)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
