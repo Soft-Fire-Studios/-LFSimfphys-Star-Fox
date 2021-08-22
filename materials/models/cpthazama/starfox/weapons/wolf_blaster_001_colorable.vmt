@@ -1,0 +1,46 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/cpthazama/starfox/weapons/wolf_blaster_001_colorable"
+	"$bumpmap" 	"models/cpthazama/starfox/weapons/wolf_blaster_001_n"
+	"$phongexponenttexture" "vj_base/exponent"
+	"$phongwarptexture" 	"models/cpthazama/starfox/phongwarp_metal2"
+
+	// "$alphatest" "1"
+	"$nodecal" "1"
+	// "$color" "[1 1 1]"
+
+	"$emissiveBlendEnabled" 		"1"
+    "$emissiveBlendTexture"    		"dev/null"
+    "$emissiveBlendBaseTexture"    	"models/cpthazama/starfox/weapons/wolf_blaster_001_g"
+    "$emissiveBlendFlowTexture"    	"dev/null"
+    "$emissiveBlendTint" 			"[1 1 1]"
+    "$emissiveBlendStrength" 		"1"
+    "$emissiveBlendScrollVector" 	"[0 0]"
+
+	"$phong" 						"1"
+	"$phongexponent" 				"1"
+	"$phongboost" 					"5"
+	"$phongfresnelranges" 			"[0.75 0.35 1]"
+	"$phongalbedotint" 				"1"
+
+	"$normalmapalphaenvmapmask"		"1"
+
+	"$rimlight"     				"1"
+	"$rimlightexponent"   			"1" 
+	"$rimlightboost"   				"1"
+	"$rimmask"     					"1"
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.4 0.4 0.4]"
+
+	Proxies
+	{
+		PlayerWeaponColor
+		{
+			resultVar	$envmaptint
+			resultVar	$emissiveBlendTint
+		}
+	}
+
+	"$lightwarptexture"				"models/cpthazama/starfox/warp2"
+}

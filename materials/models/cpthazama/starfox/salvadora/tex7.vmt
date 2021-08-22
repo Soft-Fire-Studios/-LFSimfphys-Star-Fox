@@ -1,0 +1,29 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/cpthazama/starfox/salvadora/tex7"
+	"$bumpmap" 	"models/cpthazama/starfox/salvadora/tex7_n"
+	"$phongexponenttexture" "vj_base/exponent"
+	"$phongwarptexture" 	"models/cpthazama/starfox/phongwarp_metal2"
+
+	"$alphatest" "1"
+	"$nodecal" "1"
+	"$nocull" "1"
+
+	"$phong" 						"1"
+	"$phongexponent" 				"1"
+	"$phongboost" 					"5"
+	"$phongfresnelranges" 			"[0.75 0.35 1]"
+	"$phongalbedotint" 				"1"
+
+	"$normalmapalphaenvmapmask"		"1"
+
+	"$rimlight"     				"1"
+	"$rimlightexponent"   			"1" 
+	"$rimlightboost"   				"1"
+	"$rimmask"     					"1"
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.4 0.4 0.4]"
+
+	"$lightwarptexture"				"models/cpthazama/starfox/warp2"
+}
