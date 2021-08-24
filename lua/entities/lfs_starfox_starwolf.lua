@@ -18,8 +18,8 @@ if CLIENT then
 	end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 	function ENT:Initialize()
-		local assault = self:GetNW2Bool("IsAssault")
-		SF_CreateTrack(assault && "cpthazama/starfox/music/star_wolf_assault.mp3" or "cpthazama/starfox/music/star_wolf.mp3",LocalPlayer(),"Star Wolf")
+		local MKType = self:GetNW2Int("StarWolfMK")
+		SF_CreateTrack(MKType == 2 && "cpthazama/starfox/music/star_wolf_assault.mp3" or MKType == 3 && "cpthazama/starfox/music/star_wolf_mkiii.mp3" or "cpthazama/starfox/music/star_wolf.mp3",LocalPlayer(),"Star Wolf")
 	end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 	function ENT:OnRemove()
@@ -30,8 +30,8 @@ end
 if !SERVER then return end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:Initialize()
-	self:SetNW2Bool("IsAssault",math.random(1,2) == 1)
-	local assault = self:GetNW2Bool("IsAssault")
+	self:SetNW2Int("StarWolfMK",math.random(1,3))
+	local MKType = self:GetNW2Int("StarWolfMK")
 	self:SetModel("models/props_junk/sawblade001a.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_NONE)
@@ -52,8 +52,8 @@ function ENT:Initialize()
 
 	self.Squad = {}
 
-	local ent = assault && "lfs_starfox_wolfen" or "lfs_starfox_wolfen_zero"
-	for i = 1,assault && 3 or 4 do
+	local ent = MKType == 2 && "lfs_starfox_wolfen" or MKType == 3 && "lfs_starfox_wolfen_redfang" or "lfs_starfox_wolfen_zero"
+	for i = 1,MKType > 1 && 3 or 4 do
 		local tbl = self.Squad
 		table.insert(tbl,self)
 

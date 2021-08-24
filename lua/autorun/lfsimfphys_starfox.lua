@@ -174,4 +174,14 @@ function SF_StopAllTracks()
 end
 end
 
+if SERVER then
+	hook.Add("PlayerEnteredVehicle","SF_PlayerEnteredVehicle",function(ply,ent,seatID)
+		if ply:Nick() == "Cpt. Hazama" then
+			VJ_CreateSound(ply,"cpthazama/starfox/vo/wolf_assault/enter_ship.wav",72)
+			-- local vehicle = ply:lfsGetPlane()
+			-- vehicle:ToggleEngine()
+		end
+	end)
+end
+
 print("Successfully Loaded [LFSimfphys] Star Fox Autorun file!")
