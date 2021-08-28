@@ -67,6 +67,8 @@ ENT.MaxSecondaryAmmo = 10
 ENT.Stability 	= 	0.8
 ENT.MaxStability 	= 	0.8
 
+SF.AddShipData("lfs_starfox_arwing",ENT.PrintName,ENT.MDL,ENT.MaxHealth,ENT.MaxShield,ENT.MaxPrimaryAmmo,ENT.MaxSecondaryAmmo,"The Arwing is the personal super-high performance combat spacecraft used by members of the Star Fox Team. Developed by Space Dynamics Co., Ltd., the Arwing is equipped with the revolutionary G-Diffuser system, an anti-gravity device which allows the pilot to accelerate or decelerate instantaneously and perform a wide variety of high performance combat maneuvers. By executing an aileron or barrel roll, the Arwing can also generate an electromagnetic shield which will deflect most optically based weapons, such as laser beams. The Arwings used by the Star Fox Team are much different from any production versions as they have been extensively modified with improved armor and advanced weapon systems, such as Hyper Laser Homing Bolts and Smart Bombs. Despite numerous revisions and redesigns over the course of the team's history, the many models of Arwings have maintained the balance of speed, power and performance that they are credited for. The Arwing starfighter is the primary battle vehicle of the Star Fox Team, and is almost the symbol of their team.",0)
+
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 	self:NetworkVar("Float",21,"ChargeT")

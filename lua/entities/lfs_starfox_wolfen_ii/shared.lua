@@ -61,6 +61,8 @@ ENT.MaxPrimaryAmmo = 10000
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	5
 
+SF.AddShipData("lfs_starfox_wolfen_ii",ENT.PrintName,ENT.MDL,ENT.MaxHealth,ENT.MaxShield,ENT.MaxPrimaryAmmo,ENT.MaxSecondaryAmmo,nil,40)
+
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 end

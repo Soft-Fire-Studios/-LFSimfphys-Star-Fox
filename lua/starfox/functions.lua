@@ -5,6 +5,99 @@ print("Loading [LFSimfphys] Star Fox Functions file...")
 SF = {}
 SF.CachedSounds = {}
 SF.AITurrets = {}
+SF.ShipData = {}
+
+local function GetPlyName(ply)
+	return string.gsub(ply:SteamID(),":","_")
+end
+
+SF.AddShipData = function(ship,name,mdl,health,shield,ammo1,ammo2,bio,unlockLevel)
+	SF.ShipData[ship] = {
+		ID = ship,
+		Name = name,
+		Model = mdl,
+		Health = health or 1,
+		Shield = shield or 0,
+		PrimaryAmmo = ammo1 or -1,
+		SecondaryAmmo = ammo2 or -1,
+		Bio = bio or "[Missing Bio]",
+		UnlockLevel = unlockLevel or 0
+	}
+	print("Successfully registered " .. name .. "!")
+end
+
+SF.GetReqXP = function(lvl)
+	return ((lvl *5) *500) *1.25
+end
+
+SF.GetData = function(ply,ship)
+	local name = GetPlyName(ply)
+	local fileName = ship && "lfsimfphys_starfox/customization/" .. name .. "_" .. ship .. ".dat" or "lfsimfphys_starfox/player/" .. name .. ".dat"
+	local data = SF_C.ReadData(fileName) or {}
+
+	return data,fileName
+end
+
+SF.OnLevelUp = function(ply,data,isShip)
+	if GetConVar("lfs_sf_xpchat"):GetBool() == true then
+		ply:ChatPrint(!isShip && "You've successfully leveled up! You are now a Level " .. data.Level .. " Pilot!" or "Your " .. SF.ShipData[ply:GetInfo("lfs_sf_ship")].Name .. " is now Level " .. data.Level .. "!")
+	end
+end
+
+SF.CalcXP = function(ent)
+	if ent.GetGunnerSeat then
+		return math.Round(ent.MaxHealth *math.Rand(0.95,2))
+	elseif ent:IsPlayer() then
+		local pXP = SF.GetData(ent).XP or 0
+		local sXP = SF.GetData(ent,ent:GetInfo("lfs_sf_ship")).XP or 0
+		return math.Round((pXP +sXP) *1.25)
+	elseif ent:IsNPC() then
+		return math.Round(ent:GetMaxHealth() *math.Rand(0.95,2))
+	end
+end
+
+SF.SetXP = function(ply,xp,give,isShip)
+	if isShip then
+		local data,fileName = SF.GetXP(ply,true)
+
+		data.XP = give && (data.XP or 0) +xp or xp
+		local reqXP = SF.GetReqXP(data.Level or 1)
+		if give && GetConVar("lfs_sf_xpchat"):GetBool() == true then
+			ply:ChatPrint("Your ship has obtained " .. xp .. " XP!")
+		end
+		if data.XP >= reqXP then
+			data.Level = (data.Level or 1) +(math.Clamp(math.floor(data.XP /reqXP),1,SF_MAX_LEVEL))
+			SF.OnLevelUp(ply,data,isShip)
+		end
+		SF_C.WriteData(fileName,data,true)
+		return
+	end
+	local data,fileName = SF.GetXP(ply)
+
+	data.XP = give && (data.XP or 0) +xp or xp
+	local reqXP = SF.GetReqXP(data.Level or 1)
+	if give && GetConVar("lfs_sf_xpchat"):GetBool() == true then
+		ply:ChatPrint("You have obtained " .. xp .. " XP!")
+	end
+	if data.XP >= reqXP then
+		data.Level = (data.Level or 1) +(math.Clamp(math.floor(data.XP /reqXP),1,SF_MAX_LEVEL))
+		SF.OnLevelUp(ply,data)
+	end
+	SF_C.WriteData(fileName,data,true)
+end
+
+SF.GetXP = function(ply,isShip)
+	local name = GetPlyName(ply)
+	if isShip then
+		local ship = ply:GetInfo("lfs_sf_ship")
+		local data,filename = SF.GetData(ply,ship)
+
+		return data,filename
+	end
+
+	local data,filename = SF.GetData(ply,ship)
+	return data,filename
+end
 
 local viewLerpVec = Vector(0,0,0)
 local viewLerpAng = Angle(0,0,0)

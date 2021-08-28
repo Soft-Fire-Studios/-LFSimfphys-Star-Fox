@@ -31,7 +31,7 @@ SF_C.CreateDir = function(dirName) // SF_C.CreateDir("customization")
     end
 end
 
-SF_C.WriteData = function(fileName,dat,delete) // SF_C.WriteData("lfsimfphys_starfox/customization/arwing.dat",{Hip=true,Hop=false},true)
+SF_C.WriteData = function(fileName,dat,delete) // SF_C.WriteData("lfsimfphys_starfox/customization/lfs_starfox_arwing.dat",{Hip=true,Hop=false},true)
 	dat = LZMA(dat,true)
 	if delete then
 		file.Write(fileName,dat)
@@ -40,14 +40,12 @@ SF_C.WriteData = function(fileName,dat,delete) // SF_C.WriteData("lfsimfphys_sta
 	file.Append(fileName,dat)
 end
 
-SF_C.ReadData = function(fileName) // SF_C.ReadData("lfsimfphys_starfox/customization/arwing.dat")
+SF_C.ReadData = function(fileName) // SF_C.ReadData("lfsimfphys_starfox/customization/lfs_starfox_arwing.dat")
 	local data = file.Read(fileName,"DATA")
 	if data == nil then return end
 	local decompressed = LZMA(data)
 	return (decompressed != nil && util.JSONToTable(decompressed)) or util.JSONToTable(data)
 end
-
-
 
 local function ShowStats(ply)
 	net.Start("SF_Menu")
@@ -59,23 +57,6 @@ if SERVER then
     util.AddNetworkString("SF_Menu")
     return
 end
-
-local translations_Ships = {
-    ["models/cpthazama/starfox/vehicles/arwing.mdl"] = "Arwing Mk. II",
-    ["models/cpthazama/starfox/vehicles/cornerian_carrier.mdl"] = "Cornerian Cruiser",
-    -- ["models/cpthazama/starfox/vehicles/cornerian_fighter.mdl"] = "Cornerian Figher Mk. II",
-    ["models/cpthazama/starfox/vehicles/cornerian_fighter_aparoid.mdl"] = "Cornerian Figher Mk. II (Infected)",
-    ["models/cpthazama/starfox/vehicles/venom_carrier.mdl"] = "Venomian Carrier",
-    -- ["models/cpthazama/starfox/vehicles/venom_battleship.mdl"] = "Venomian Battleship",
-    ["models/cpthazama/starfox/vehicles/venom_dragon_fighter.mdl"] = "Venomian Figher Mk. I",
-    ["models/cpthazama/starfox/vehicles/venomian_bomber.mdl"] = "Venomian Stealth Bomber",
-    ["models/cpthazama/starfox/vehicles/venomian_fighter.mdl"] = "Venomian Fighter Mk. II",
-    ["models/cpthazama/starfox/vehicles/wolfen.mdl"] = "Wolfen Mk. II",
-    ["models/cpthazama/starfox/vehicles/wolfen_ii.mdl"] = "Wolfen II (64)",
-    ["models/cpthazama/starfox/vehicles/wolfen_ii_zero.mdl"] = "Wolfen II",
-    ["models/cpthazama/starfox/vehicles/wolfen_redfang.mdl"] = "Wolfen Mk. III",
-    ["models/cpthazama/starfox/vehicles/wolfen_zero.mdl"] = "Wolfen Mk. I",
-}
 
 net.Receive("SF_Menu",function(len,ply)
     local ply = LocalPlayer()
@@ -144,28 +125,55 @@ net.Receive("SF_Menu",function(len,ply)
     PanelSelect:Dock(FILL)
 
     local shipList = {}
-    for mdl,name in SortedPairs(translations_Ships) do
+    for _,data in SortedPairs(SF.ShipData) do
+        local name = data.Name
+        local mdl = data.Model
+        local ID = data.ID
+
         local icon = vgui.Create("SpawnIcon")
         icon:SetModel(mdl)
         icon:SetSize(64,64)
         icon:SetTooltip(name)
         icon.ShipName = name
         icon.ShipModel = mdl
-        local tName = string.Replace(mdl,"models/cpthazama/starfox/vehicles/","")
-        tName = string.Replace(tName,".mdl","")
-        icon.ShipID = tName
-        PanelSelect:AddPanel(icon,{lfs_sf_ship = tName})
-        table.insert(shipList,{Name=name,Model=mdl,ID=tName})
+        icon.ShipID = ID
+        icon.ShipData = data
+        PanelSelect:AddPanel(icon,{lfs_sf_ship = ID})
+        table.insert(shipList,data)
     end
     
-    local function UpdateStats(panel,currentShip)
-        if panel.StatsName then
-            panel.StatsName:SetText(currentShip)
-        else
-            panel.StatsName = vgui.Create("RichText",panel)
-            panel.StatsName:Dock(BOTTOM)
-            panel.StatsName:SetText(currentShip)
+    local function UpdateStats(panel,currentID)
+        panel.TextData = panel.TextData or {}
+
+        local function AddText(id,text)
+            if panel.TextData[id] then
+                panel.TextData[id]:SetText(text)
+            else
+                panel.TextData[id] = vgui.Create("RichText",panel)
+                panel.TextData[id]:Dock(BOTTOM)
+                panel.TextData[id]:SetText(text)
+            end
         end
+
+        local ship = SF.ShipData[currentID]
+        if !ship then return end
+        local ammo1 = ship.PrimaryAmmo
+        local ammo2 = ship.SecondaryAmmo
+        local uLevel = ship.UnlockLevel
+        local pLevel = SF.GetData(LocalPlayer()).Level or 1
+        local sLevel = SF.GetData(LocalPlayer(),currentID).Level or 1
+        local mult = (sLevel *0.1)
+        mult = mult < 1 && 1 or mult
+
+        AddText("Description","Description - " .. ship.Bio)
+        AddText("MaxSecondaryAmmo","Max Secondary Ammo - " .. ship.SecondaryAmmo *mult)
+        AddText("MaxPrimaryAmmo","Max Primary Ammo - " .. ship.PrimaryAmmo *mult)
+        AddText("Shield","Shield - " .. ship.Shield *mult)
+        AddText("Health","Health - " .. ship.Health *mult)
+        AddText("ShipLevel","Ship Level - " .. sLevel .. "/50")
+        AddText("PilotLevel","Pilot Level - " .. pLevel .. "/50")
+        AddText("UnlockLevel",pLevel < uLevel && "Unlock At Pilot Level " .. uLevel or "")
+        AddText("Name",ship.Name)
     end
 
     local shipData = {}
@@ -185,7 +193,7 @@ net.Receive("SF_Menu",function(len,ply)
     mdl.LastSavedName = shipData.Name
     mdl.LastID = shipData.ID
 
-    UpdateStats(modelListPnl,mdl.LastName)
+    UpdateStats(modelListPnl,mdl.LastID)
 
 	local ent = mdl.Entity
 	local pos = ent:GetPos()
@@ -216,12 +224,7 @@ net.Receive("SF_Menu",function(len,ply)
 
         if self.LastSavedName != self.LastName then
             self.LastSavedName = self.LastName
-            UpdateStats(modelListPnl,self.LastSavedName)
-            -- net.Start("PersonaMod_UpdateSVPersona")
-            --     net.WriteEntity(LocalPlayer())
-            --     net.WriteString(currentShip)
-            -- net.SendToServer()
-            -- surface.PlaySound("cpthazama/persona5/misc/00086.wav")
+            UpdateStats(modelListPnl,currentShip)
         end
 
         local modelname = shipData.Model
@@ -234,25 +237,6 @@ net.Receive("SF_Menu",function(len,ply)
         mdl.LastModel = modelname
         mdl.LastName = shipData.Name
         mdl.LastID = shipData.ID
-
-        -- if !IsValid(self.Room) then
-        --     self.Room = ClientsideModel("models/cpthazama/starfox/skybox/skybox1.mdl",RENDER_GROUP_OPAQUE_ENTITY)
-        --     self.Room:SetPos(ent:GetPos())
-        --     self.Room:SetModelScale(2)
-        --     self.Room:SetParent(ent)
-        --     self.Room:SetNoDraw(true)
-        --     local index = "SF_CSRemove_" .. ent:EntIndex()
-        --     hook.Add("Think",index,function()
-        --         if !IsValid(ent) then
-        --             SafeRemoveEntity(self.Room)
-        --             hook.Remove("Think",index)
-        --         end
-        --     end)
-        --     return
-        -- end
-        
-        -- self.Room:DrawModel()
-        -- ent:DrawModel()
 
         if !self.Capturing then return end
 
@@ -274,3 +258,41 @@ net.Receive("SF_Menu",function(len,ply)
         ent:SetEyeTarget(self:GetCamPos())
     end
 end)
+
+if CLIENT then
+	hook.Add("AddToolMenuTabs","StarFox_AddIcon",function()
+		spawnmenu.AddToolTab("Star Fox","Star Fox","icons/starfox/logo16.png")
+	end)
+	hook.Add("PopulateToolMenu","StarFox_AddMenus",function()
+		spawnmenu.AddToolMenuOption("Star Fox","Settings","Main Settings","Main Settings","","",function(Panel)
+			local DefaultBox = {Options = {},CVars = {},Label = "#Presets",MenuButton = "1",Folder = "Main Settings"}
+			DefaultBox.Options["#Default"] = {
+				lfs_sf_voteams = "1",
+				lfs_sf_cameraspeed = "3",
+				lfs_sf_xpvehicle = "1",
+				lfs_sf_xpchat = "1",
+			}
+			Panel:AddControl("ComboBox",DefaultBox)
+			Panel:AddControl("CheckBox",{Label = "Enable XP chat prompts",Command = "lfs_sf_xpchat"})
+			Panel:AddControl("CheckBox",{Label = "Only enemy VO will appear on your screen",Command = "lfs_sf_voteams"})
+			Panel:AddControl("Slider",{Label = "Third-Person Camera Refresh Speed",Command = "lfs_sf_cameraspeed",Min = 1,Max = 30})
+			Panel:AddControl("Button",{Label = "Open Hangar Bay",Command = "lfs_sf_showmenu"})
+
+            if !(!game.SinglePlayer() && !LocalPlayer():IsAdmin()) then
+			    Panel:AddControl("CheckBox",{Label = "Only allow XP to be earned while using vehicles",Command = "lfs_sf_xpvehicle"})
+            end
+		end,{})
+		spawnmenu.AddToolMenuOption("Star Fox","Settings","Mission Settings","Mission Settings","","",function(Panel)
+            if !(!game.SinglePlayer() && !LocalPlayer():IsAdmin()) then
+                local DefaultBox = {Options = {},CVars = {},Label = "#Presets",MenuButton = "1",Folder = "Mission Settings"}
+                DefaultBox.Options["#Default"] = {
+                    lfs_sf_mission_allies = "1",
+                    lfs_sf_mission_forceply = "1",
+                }
+
+			    Panel:AddControl("CheckBox",{Label = "Allow NPC Allies in Missions",Command = "lfs_sf_mission_allies"})
+			    Panel:AddControl("CheckBox",{Label = "Force Players into vehicles during Aerial Missions",Command = "lfs_sf_mission_forceply"})
+            end
+		end,{})
+    end)
+end

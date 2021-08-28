@@ -61,54 +61,8 @@ ENT.MaxPrimaryAmmo = 10000
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	1
 
+SF.AddShipData("lfs_starfox_wolfen_zero",ENT.PrintName,ENT.MDL,ENT.MaxHealth,ENT.MaxShield,ENT.MaxPrimaryAmmo,ENT.MaxSecondaryAmmo,nil,25)
+
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 end
-
-sound.Add({
-	name = "LFS_SF_ARWING_ENGINE",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_ENGINE2",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	sound = "cpthazama/starfox/vehicles/arwing_eng.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_BOOST",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "cpthazama/starfox/vehicles/arwing_eng_boost_short.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_laser_single_hit.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY_CHARGED",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_fire_charged.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY_DOUBLE",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_laser_double.wav"
-})

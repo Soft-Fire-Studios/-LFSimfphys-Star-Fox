@@ -1,15 +1,22 @@
 print("Loading [LFSimfphys] Star Fox Autorun file...")
 
 CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"If enabled, only enemy VO will appear on your screen")
+CreateConVar("lfs_sf_xpvehicle",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Only allow XP to be earned while using vehicles")
 CreateConVar("lfs_sf_cameraspeed",3,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Update speed of the third person camera")
 CreateConVar("lfs_sf_mission_allies",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the spawning of allies in missions")
 CreateConVar("lfs_sf_mission_forceply",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the forcing of players into vehicles during missions")
-CreateClientConVar("lfs_sf_ship","arwing",true,true)
+CreateClientConVar("lfs_sf_ship","lfs_starfox_arwing",true,true)
+CreateClientConVar("lfs_sf_xpchat","1",true,true)
 
+AddCSLuaFile("starfox/functions.lua")
+include("starfox/functions.lua")
 include("starfox/customization.lua")
 
+SF_C.CreateDir("player")
 SF_C.CreateDir("customization")
 SF_C.CreateDir("factions")
+
+SF_MAX_LEVEL = 50
 
 SF_AI_TEAM_CORNERIA = 1
 SF_AI_TEAM_ANDROSS = 2
@@ -180,6 +187,40 @@ if SERVER then
 			VJ_CreateSound(ply,"cpthazama/starfox/vo/wolf_assault/enter_ship.wav",72)
 			-- local vehicle = ply:lfsGetPlane()
 			-- vehicle:ToggleEngine()
+		end
+	end)
+
+	hook.Add("OnNPCKilled","SF_NPCKilled",function(ent,killer,weapon)
+		if IsValid(killer) && killer:IsPlayer() then
+			local vehicle = killer:lfsGetPlane()
+			local vehOnly = GetConVar("lfs_sf_xpvehicle"):GetBool()
+			local xp = SF.CalcXP(ent)
+			if !vehOnly then
+				SF.SetXP(killer,xp,true)
+			end
+			if IsValid(vehicle) then
+				if vehOnly then
+					SF.SetXP(killer,xp,true)
+				end
+				SF.SetXP(killer,xp,true,true)
+			end
+		end
+	end)
+
+	hook.Add("PlayerDeath","SF_PlayerKilled",function(ent,killer,weapon)
+		if IsValid(killer) && killer:IsPlayer() && killer != ent then
+			local vehicle = killer:lfsGetPlane()
+			local vehOnly = GetConVar("lfs_sf_xpvehicle"):GetBool()
+			local xp = SF.CalcXP(ent)
+			if !vehOnly then
+				SF.SetXP(killer,xp,true)
+			end
+			if IsValid(vehicle) then
+				if vehOnly then
+					SF.SetXP(killer,xp,true)
+				end
+				SF.SetXP(killer,xp,true,true)
+			end
 		end
 	end)
 end

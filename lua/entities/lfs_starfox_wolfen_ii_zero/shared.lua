@@ -61,6 +61,10 @@ ENT.MaxPrimaryAmmo = 10000
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	5
 
+SF.AddShipData("lfs_starfox_wolfen_ii_zero",ENT.PrintName,ENT.MDL,ENT.MaxHealth,ENT.MaxShield,ENT.MaxPrimaryAmmo,ENT.MaxSecondaryAmmo,
+"The Wolfen II was an upgraded Wolfen starfighter used by the Star Wolf team when defending Andross's Palace during the Lylat Wars.",
+45)
+
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 end

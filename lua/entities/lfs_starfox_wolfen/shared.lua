@@ -66,6 +66,10 @@ ENT.MaxSecondaryAmmo = 10
 ENT.Stability 	= 	1
 ENT.MaxStability 	= 	1
 
+SF.AddShipData("lfs_starfox_wolfen",ENT.PrintName,ENT.MDL,ENT.MaxHealth,ENT.MaxShield,ENT.MaxPrimaryAmmo,ENT.MaxSecondaryAmmo,
+"The Wolfen Mk. II is an upgraded form of the Wolfen Mk. I, featuring characteristics and enhancements from the Wolfen II. The Wolfen II was too much for Star Wolf team to handle, so the compromise was to make a Wolfen between the lines of the Wolfen Mk. I and the Wolfen II. The Wolfen Mk. II was utilized by Star Wolf team during the Aparoid invasions.",
+30)
+
 function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 	self:NetworkVar("Float",21,"ChargeT")

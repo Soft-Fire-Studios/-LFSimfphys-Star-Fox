@@ -1,9 +1,6 @@
 ENT.Type            = "anim"
 DEFINE_BASECLASS( "lunasflightschool_basescript" )
 
-AddCSLuaFile("starfox/functions.lua")
-include("starfox/functions.lua")
-
 ENT.PrintName = "Venomian Carrier Mk. II"
 ENT.Author = "Cpt. Hazama"
 ENT.Information = ""

@@ -91,7 +91,8 @@ function ENT:StartAssaultMission()
 			v:SelectWeapon("weapon_physgun")
 			local sPos = self:GetSpawnPos(500,10)
 			if sPos then
-				local veh = self:SpawnVehicle("lfs_starfox_" .. v:GetInfo("lfs_sf_ship"),sPos,false)
+				local veh = self:SpawnVehicle(v:GetInfo("lfs_sf_ship"),sPos,false)
+				-- local veh = self:SpawnVehicle("lfs_starfox_" .. v:GetInfo("lfs_sf_ship"),sPos,false)
 				if self.MissionForceTeam then
 					veh:SetAITEAM(self.MissionTeam)
 				end
