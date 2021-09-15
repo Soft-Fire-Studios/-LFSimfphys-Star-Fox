@@ -187,6 +187,48 @@ function ENT:ExhaustFX()
 	
 	if self.nextEFX < CurTime() then
 		self.nextEFX = CurTime() + 0.01
+
+		local throttle = self:GetThrottlePercent() *0.01
+		
+		if IsValid(Driver) && !vtol then
+			local rollLeft = Driver:lfsGetInput("-ROLL")
+			local rollRight = Driver:lfsGetInput("+ROLL")				
+			if rollLeft or rollRight then
+				if (rollLeft && rollRight) then return end
+				local emitter = ParticleEmitter(self:GetPos(),false)
+				if emitter then
+					local particle = emitter:Add("particles/fire_glow_sf",self:LocalToWorld(Vector(5,0,-70)))
+					local size = math.random(45,60)
+					particle:SetVelocity(self:GetVelocity() +self:GetUp() *70 +VectorRand() *400)
+					particle:SetGravity(Vector(0,0,0))
+					particle:SetLifeTime(0)
+					particle:SetDieTime(1)
+					particle:SetStartAlpha(150)
+					particle:SetEndAlpha(0)
+					particle:SetStartSize(size)
+					particle:SetEndSize(size *0.35)
+					particle:SetAngles(AngleRand() *360)
+					particle:SetColor(209,63,63)
+					for i = 1,2 do
+						local start = self:GetDriverSeat():GetPos() +self:GetDriverSeat():GetForward() *(i == 1 && 150 or -150)
+						local particle = emitter:Add("particles/fire_glow_sf",start)
+						if not particle then return end
+						local size = math.random(300,400)
+						particle:SetVelocity((self:GetVelocity() +VectorRand() *50))
+						particle:SetGravity(Vector(0,0,1))
+						particle:SetLifeTime(0)
+						particle:SetDieTime(1)
+						particle:SetStartAlpha(25)
+						particle:SetEndAlpha(0)
+						particle:SetStartSize(size)
+						particle:SetEndSize(size *0.35)
+						particle:SetAngles(AngleRand() *360)
+						particle:SetColor(255,24,24)
+					end
+					emitter:Finish()
+				end
+			end
+		end
 		
 		local emitter = ParticleEmitter( self:GetPos(), false )
 		
@@ -209,7 +251,7 @@ function ENT:ExhaustFX()
 				local Side = (i == 2 && 1 or i == 3 && -1 or 0)
 				vOffset = bone.Pos +vNormal *40 + Vector(-25 *Side,0,0)
 
-				local particle = emitter:Add(mat, vOffset )
+				local particle = emitter:Add(Material("particles/fire_glow_sf"), vOffset )
 				if not particle then return end
 				local fracMain =  (self.fracMain /15 or 1)
 				local vUp = self:GetUp()
@@ -225,7 +267,7 @@ function ENT:ExhaustFX()
 				particle:SetAirResistance(5)
 				particle:SetLifeTime( 0 )
 				particle:SetDieTime( 0.15 )
-				particle:SetStartAlpha( 255 )
+				particle:SetStartAlpha(math.Clamp(255 *throttle,0,255))
 				particle:SetEndAlpha( 0 )
 				particle:SetStartSize( size )
 				particle:SetEndSize( size )

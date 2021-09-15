@@ -15,7 +15,7 @@ function ENT:LFSHudPaintInfoLine(HitPlane,HitPilot,LFS_TIME_NOTIFY,Dir,Len,FREEL
 end
 
 function ENT:Initialize()
-	
+	//lfsGetInput( "PRI_ATTACK" )
 end
 
 local mat = Material( "sprites/light_glow02_add" )
@@ -107,8 +107,50 @@ function ENT:ExhaustFX()
 	
 	if self.nextEFX < CurTime() then
 		self.nextEFX = CurTime() + 0.01
+
+		local throttle = self:GetThrottlePercent() *0.01
 		
-		local emitter = ParticleEmitter( self:GetPos(), false )
+		if IsValid(Driver) && !vtol then
+			local rollLeft = Driver:lfsGetInput("-ROLL")
+			local rollRight = Driver:lfsGetInput("+ROLL")				
+			if rollLeft or rollRight then
+				if (rollLeft && rollRight) then return end
+				local emitter = ParticleEmitter(self:GetPos(),false)
+				if emitter then
+					local particle = emitter:Add("particles/fire_glow_sf",self:LocalToWorld(Vector(-25,0,150)))
+					local size = math.random(45,60)
+					particle:SetVelocity(self:GetVelocity() +self:GetUp() *70 +VectorRand() *400)
+					particle:SetGravity(Vector(0,0,0))
+					particle:SetLifeTime(0)
+					particle:SetDieTime(1)
+					particle:SetStartAlpha(150)
+					particle:SetEndAlpha(0)
+					particle:SetStartSize(size)
+					particle:SetEndSize(size *0.35)
+					particle:SetAngles(AngleRand() *360)
+					particle:SetColor(168,255,190)
+					for i = 1,2 do
+						local start = SF.BoneData(self,i == 1 && 4 or 7)
+						local particle = emitter:Add("particles/fire_glow_sf",start.Pos)
+						if not particle then return end
+						local size = math.random(200,300)
+						particle:SetVelocity((self:GetVelocity() +VectorRand() *50))
+						particle:SetGravity(Vector(0,0,1))
+						particle:SetLifeTime(0)
+						particle:SetDieTime(1)
+						particle:SetStartAlpha(25)
+						particle:SetEndAlpha(0)
+						particle:SetStartSize(size)
+						particle:SetEndSize(size *0.35)
+						particle:SetAngles(AngleRand() *360)
+						particle:SetColor(0,255,63)
+					end
+					emitter:Finish()
+				end
+			end
+		end
+		
+		local emitter = ParticleEmitter(self:GetPos(),false)
 		
 		if emitter then
 			local leftTop = BoneData(self,4)
@@ -123,33 +165,6 @@ function ENT:ExhaustFX()
 
 			vOffset = vOffset + vNormal * 5
 
-				-- Main Engine --
-			-- local particle = emitter:Add(mat, vOffset)
-			-- if not particle then return end
-
-			-- particle:SetVelocity( vNormal * 5 + self:GetVelocity() *-5 )
-			-- particle:SetLifeTime( 0 )
-			-- particle:SetDieTime( 0.5 )
-			-- particle:SetStartAlpha( 255 )
-			-- particle:SetEndAlpha( 0 )
-			-- particle:SetStartSize( 220 +self.BoostAdd )
-			-- particle:SetEndSize( 0 )
-			-- particle:SetAngles( vNormal:Angle() )
-			-- particle:SetColor(130,194,255)
-
-			-- local particle = emitter:Add(mat, vOffset)
-			-- if not particle then return end
-
-			-- particle:SetVelocity( vNormal * 5 + self:GetVelocity() *-5 )
-			-- particle:SetLifeTime( 0 )
-			-- particle:SetDieTime( 0.5 )
-			-- particle:SetStartAlpha( 255 )
-			-- particle:SetEndAlpha( 0 )
-			-- particle:SetStartSize( 220 +self.BoostAdd )
-			-- particle:SetEndSize( 0 )
-			-- particle:SetAngles( vNormal:Angle() )
-			-- particle:SetColor(230,166,255)
-
 				-- Side Engines --
 			for a = 1,2 do
 				for i = 1,2 do
@@ -160,7 +175,7 @@ function ENT:ExhaustFX()
 					-- vOffset = self:LocalToWorld(Vector(-70,101 *Side,225 +(Sub && 0 or 20)))
 					vOffset = bone.Pos +vNormal *40
 
-					local particle = emitter:Add(mat, vOffset )
+					local particle = emitter:Add(Material("particles/fire_glow_sf"), vOffset )
 					if not particle then return end
 					local fracMain =  (self.fracMain /15 or 1)
 					local vUp = self:GetUp()
@@ -176,7 +191,7 @@ function ENT:ExhaustFX()
 					particle:SetAirResistance(5)
 					particle:SetLifeTime( 0 )
 					particle:SetDieTime( 0.15 )
-					particle:SetStartAlpha( 255 )
+					particle:SetStartAlpha(math.Clamp(255 *throttle,0,255))
 					particle:SetEndAlpha( 0 )
 					particle:SetStartSize( size )
 					particle:SetEndSize( size )
@@ -190,29 +205,38 @@ function ENT:ExhaustFX()
 	end
 end
 
+local throttleLast = 0
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	local minPitch = 75
 	local pitch = math.Clamp(math.Clamp(minPitch + Pitch * 50, minPitch,255) + Doppler,0,255)
-	-- Entity(1):ChatPrint(pitch)
+	local throttle = self:GetThrottlePercent()
 	if self.ENG then
 		self.ENG:ChangePitch(pitch)
 		self.ENG:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
 	end
-	-- if self.ENG2 then
-		-- self.ENG2:ChangePitch(  math.Clamp(math.Clamp(  50 + Pitch * 50, 50,255) + Doppler,0,255) )
-		-- self.ENG2:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
-	-- end
+	if self.ENG2 then
+		self.ENG2:ChangePitch(pitch)
+		if throttle > throttleLast then
+			self.ENG2:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
+		else
+			self.ENG2:ChangeVolume(0)
+		end
+	end
+	throttleLast = throttle
 end
 
 function ENT:EngineActiveChanged( bActive )
 	if bActive then
-		self.ENG = CreateSound(self,"LFS_SF_ARWING_ENGINE")
+		self.ENG = CreateSound(self,"LFS_SF_ARWING_ENGINE_NEW")
 		self.ENG:PlayEx(0,0)
-		-- self.ENG2 = CreateSound(self,"LFS_SF_ARWING_ENGINE2")
-		-- self.ENG2:PlayEx(0,0)
+		self.ENG2 = CreateSound(self,"LFS_SF_ARWING_ENGINE")
+		self.ENG2:PlayEx(0,0)
 	else
 		if self.ENG then
 			self.ENG:Stop()
+		end
+		if self.ENG2 then
+			self.ENG2:Stop()
 		end
 	end
 end
@@ -248,8 +272,8 @@ function ENT:AnimFins()
 
 	self.fracMain = (RPM /MaxRPM) *15
 	
-	self:ManipulateBoneAngles( leftMiddle, Angle(self.fracMain *0.5,0,0 ) )
-	self:ManipulateBoneAngles( rightMiddle, Angle(-self.fracMain *0.5,0,0 ) )
+	self:ManipulateBoneAngles( leftMiddle, Angle((self.fracMain *1) -25,0,0 ) )
+	self:ManipulateBoneAngles( rightMiddle, Angle((-self.fracMain *1) +25,0,0 ) )
 	
 	self:ManipulateBoneAngles( leftTop, Angle( 0,0,-self.fracMain) )
 	self:ManipulateBoneAngles( leftBottom, Angle( 0,0,self.fracMain) )
@@ -265,11 +289,11 @@ end
 function ENT:AnimCabin()
 	local bOn = self:GetActive()
 	
-	local TVal = bOn and 0 or 1
+	local TVal = bOn && 0 or 1
 	
 	local Speed = FrameTime() * 4
 	
-	self.SMcOpen = self.SMcOpen and self.SMcOpen + math.Clamp(TVal - self.SMcOpen,-Speed,Speed) or 0
+	self.SMcOpen = self.SMcOpen && self.SMcOpen + math.Clamp(TVal - self.SMcOpen,-Speed,Speed) or 0
 	
 	self:ManipulateBoneAngles(3,Angle(0,0,self.SMcOpen *-90))
 end

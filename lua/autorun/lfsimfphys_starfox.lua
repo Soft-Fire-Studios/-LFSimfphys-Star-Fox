@@ -1,12 +1,16 @@
 print("Loading [LFSimfphys] Star Fox Autorun file...")
 
+// https://github.com/Blu-x92/LunasFlightSchool/blob/master/lfs%20useful%20lua%20functions.txt
+
 CreateConVar("lfs_sf_voteams",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"If enabled, only enemy VO will appear on your screen")
 CreateConVar("lfs_sf_xpvehicle",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Only allow XP to be earned while using vehicles")
 CreateConVar("lfs_sf_cameraspeed",3,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Update speed of the third person camera")
 CreateConVar("lfs_sf_mission_allies",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the spawning of allies in missions")
 CreateConVar("lfs_sf_mission_forceply",1,{FCVAR_SERVER_CAN_EXECUTE,FCVAR_ARCHIVE,FCVAR_NOTIFY},"Enables the forcing of players into vehicles during missions")
 CreateClientConVar("lfs_sf_ship","lfs_starfox_arwing",true,true)
+CreateClientConVar("lfs_sf_currentship","lfs_starfox_arwing",true,true)
 CreateClientConVar("lfs_sf_xpchat","1",true,true)
+CreateClientConVar("lfs_sf_menumusic","1",true,true)
 
 AddCSLuaFile("starfox/functions.lua")
 include("starfox/functions.lua")
@@ -16,6 +20,8 @@ SF_C.CreateDir("player")
 SF_C.CreateDir("customization")
 SF_C.CreateDir("factions")
 
+SF_CAMERA_CURRENT = NULL
+
 SF_MAX_LEVEL = 50
 
 SF_AI_TEAM_CORNERIA = 1
@@ -23,6 +29,8 @@ SF_AI_TEAM_ANDROSS = 2
 SF_AI_TEAM_APAROID = 5
 
 if CLIENT then
+	SF.AddMissionData(1,"Test Star Wolf","Test","entities/lfs_starfox_mission_assault_2.png",true)
+
 	local ships = {
 		["lfs_starfox_arwing"] = "Arwing Mk. II",
 		["lfs_starfox_cornerian_fighter_aparoid"] = "Cornerian Fighter Mk. II (Infected)",
@@ -32,6 +40,7 @@ if CLIENT then
 		["lfs_starfox_venom_fighter_dragon"] = "Venomian Figher Mk. I",
 		["lfs_starfox_wolfen"] = "Wolfen Mk. II",
 		["lfs_starfox_wolfen_zero"] = "Wolfen Mk. I",
+		["lfs_starfox_wolfen_zero_boss"] = "Wolfen Mk. I",
 		["lfs_starfox_wolfen_ii"] = "Wolfen II (64)",
 		["lfs_starfox_wolfen_ii_zero"] = "Wolfen II",
 		["lfs_starfox_wolfen_redfang"] = "Wolfen Mk. III",
@@ -42,6 +51,10 @@ if CLIENT then
 		killicon.Add(class,"HUD/killicons/default",Color(255,80,0,255))
 		killicon.Add("#" .. class,"HUD/killicons/default",Color(255,80,0,255))
 	end
+
+	SF_AI_TRANSLATE_TEXTURE = {
+		["Wolf (Zero)"] = "wolf",
+	}
 
 	SF_AI_TRANSLATE = {
 		["Fox"] = "Fox McCloud",
@@ -58,6 +71,11 @@ if CLIENT then
 		["Leon"] = "Leon Powalski",
 		["Andrew"] = "Andrew Oikonny",
 		["Pigma"] = "Pigma Dengar",
+
+		["Wolf (Zero)"] = "Wolf O'Donnell",
+		["Leon (Zero)"] = "Leon Powalski",
+		["Andrew (Zero)"] = "Andrew Oikonny",
+		["Pigma (Zero)"] = "Pigma Dengar",
 
 		["Wolf_Assault"] = "Wolf O'Donnell",
 		["Leon_Assault"] = "Leon Powalski",
@@ -82,6 +100,11 @@ SF_AI_UNIQUE = {
 	["Leon"] = NULL,
 	["Andrew"] = NULL,
 	["Pigma"] = NULL,
+
+	["Wolf (Zero)"] = NULL,
+	["Leon (Zero)"] = NULL,
+	["Andrew (Zero)"] = NULL,
+	["Pigma (Zero)"] = NULL,
 
 	["Wolf_Assault"] = NULL,
 	["Leon_Assault"] = NULL,
@@ -182,6 +205,8 @@ end
 end
 
 if SERVER then
+	util.AddNetworkString("SF_PlayVO")
+
 	hook.Add("PlayerEnteredVehicle","SF_PlayerEnteredVehicle",function(ply,ent,seatID)
 		if ply:Nick() == "Cpt. Hazama" then
 			VJ_CreateSound(ply,"cpthazama/starfox/vo/wolf_assault/enter_ship.wav",72)
@@ -205,6 +230,10 @@ if SERVER then
 				SF.SetXP(killer,xp,true,true)
 			end
 		end
+	end)
+
+	hook.Add("PlayerInitialSpawn","SF_PlayerInitSpawn",function(ply)
+		SF.SetLockStatus(ply,"lfs_starfox_arwing",true)
 	end)
 
 	hook.Add("PlayerDeath","SF_PlayerKilled",function(ent,killer,weapon)

@@ -1,0 +1,16 @@
+"UnlitGeneric"
+{
+	"$basetexture" "effects/starfox/render_cloak"
+	"$nodecal" "1"
+	"$translucent" "1"
+	// "$nocull" "1"
+	"Proxies"
+	{
+		"TextureScroll"
+		{
+			"texturescrollvar" "$basetexturetransform"
+			"texturescrollrate" 0.25
+			"texturescrollangle" 60
+		}
+	}
+}

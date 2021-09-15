@@ -2,13 +2,23 @@ print("Loading [LFSimfphys] Star Fox Functions file...")
 
 //https://wiki.facepunch.com/gmod/PhysObj:AddAngleVelocity
 
-SF = {}
-SF.CachedSounds = {}
-SF.AITurrets = {}
-SF.ShipData = {}
+SF = SF or {}
+SF.CachedSounds = SF.CachedSounds or {}
+SF.AITurrets = SF.AITurrets or {}
+SF.MissionData = SF.MissionData or {}
+SF.ShipData = SF.ShipData or {}
 
 local function GetPlyName(ply)
 	return string.gsub(ply:SteamID(),":","_")
+end
+
+SF.DoVO = function(ent,snd,chance,stopAll)
+	net.Start("SF_PlayVO")
+		net.WriteEntity(ent)
+		net.WriteString(VJ_PICK(snd))
+		net.WriteFloat(chance or 30)
+		net.WriteBool(stopAll or false)
+	net.Broadcast()
 end
 
 SF.AddShipData = function(ship,name,mdl,health,shield,ammo1,ammo2,bio,unlockLevel)
@@ -21,9 +31,20 @@ SF.AddShipData = function(ship,name,mdl,health,shield,ammo1,ammo2,bio,unlockLeve
 		PrimaryAmmo = ammo1 or -1,
 		SecondaryAmmo = ammo2 or -1,
 		Bio = bio or "[Missing Bio]",
-		UnlockLevel = unlockLevel or 0
+		UnlockLevel = unlockLevel or 0,
+		ReqParts = ReqParts or 1
 	}
-	print("Successfully registered " .. name .. "!")
+	-- print("Successfully registered " .. name .. "!")
+end
+
+SF.AddMissionData = function(id,name,desc,icon,isBad)
+	SF.MissionData[#SF.MissionData +1] = {
+		ID = id,
+		Name = name,
+		Description = desc,
+		Icon = icon,
+		IsBad = isBad,
+	}
 end
 
 SF.GetReqXP = function(lvl)
@@ -36,6 +57,26 @@ SF.GetData = function(ply,ship)
 	local data = SF_C.ReadData(fileName) or {}
 
 	return data,fileName
+end
+
+SF.SetLockStatus = function(ply,ship,unlocked)
+	local data,fileName = SF.GetData(ply,ship)
+
+	data.Unlocked = unlocked
+	if unlocked && GetConVar("lfs_sf_xpchat"):GetBool() == true then
+		ply:ChatPrint("You've unlocked the " .. SF.ShipData[ship].Name .. "!")
+	end
+	SF_C.WriteData(fileName,data,true)
+end
+
+SF.SetParts = function(ply,parts,give,ship)
+	local data,fileName = SF.GetData(ply,ship)
+
+	data.Parts = give && (data.Parts or 0) +parts or parts
+	if give && GetConVar("lfs_sf_xpchat"):GetBool() == true then
+		ply:ChatPrint("You've obtained " .. parts .. " " .. SF.ShipData[ship].Name .. " parts!")
+	end
+	SF_C.WriteData(fileName,data,true)
 end
 
 SF.OnLevelUp = function(ply,data,isShip)
@@ -99,18 +140,42 @@ SF.GetXP = function(ply,isShip)
 	return data,filename
 end
 
-local viewLerpVec = Vector(0,0,0)
-local viewLerpAng = Angle(0,0,0)
 SF.CalcThirdView = function(self,view,ply)
-	local FT = FrameTime() *(GetConVar("lfs_sf_cameraspeed"):GetInt() or 4)
+	local frameTime = FrameTime()
+	local FT = frameTime *(GetConVar("lfs_sf_cameraspeed"):GetInt() or 4)
+
+	if IsValid(SF_CAMERA_CURRENT) then
+		local targetPos = SF_CAMERA_CURRENT:GetDriverSeat():GetPos()
+		if SF_CAMERA_CURRENT.CameraPos && SF_CAMERA_CURRENT.SpawnCameraT == nil then
+			SF_CAMERA_CURRENT.SpawnCameraT = CurTime() +(SF_CAMERA_CURRENT.CameraTime or 5)
+			SF_CAMERA_CURRENT.viewLerpVec = SF_CAMERA_CURRENT:LocalToWorld(SF_CAMERA_CURRENT.CameraPos.Start)
+			SF_CAMERA_CURRENT.viewLerpAng = (targetPos -SF_CAMERA_CURRENT.viewLerpVec):Angle()
+			SF_CAMERA_CURRENT.viewIncrease = (GetConVar("lfs_sf_cameraspeed"):GetInt() or 4)
+		end
+		if SF_CAMERA_CURRENT.SpawnCameraT && CurTime() <= SF_CAMERA_CURRENT.SpawnCameraT then
+			FT = frameTime *SF_CAMERA_CURRENT.viewIncrease
+			SF_CAMERA_CURRENT.viewIncrease = math.Clamp(SF_CAMERA_CURRENT.viewIncrease +0.01,1,50)
+			SF_CAMERA_CURRENT.viewLerpVec = LerpVector(FT,SF_CAMERA_CURRENT.viewLerpVec,SF_CAMERA_CURRENT:LocalToWorld(SF_CAMERA_CURRENT.CameraPos.End))
+			SF_CAMERA_CURRENT.viewLerpAng = LerpAngle(FT,SF_CAMERA_CURRENT.viewLerpAng,(targetPos -SF_CAMERA_CURRENT.viewLerpVec):Angle())
+			local newView = {}
+			newView.origin = SF_CAMERA_CURRENT.viewLerpVec
+			newView.angles = SF_CAMERA_CURRENT.viewLerpAng
+			return newView
+		end
+	end
 	local pos = view.origin
 	local ang = view.angles
 
-	viewLerpVec = LerpVector(FT,viewLerpVec,pos)
-	viewLerpAng = LerpAngle(FT,viewLerpAng,ang)
+	if self.viewLerpVec == nil then
+		self.viewLerpVec = self:GetPos() +Vector(0,0,self:OBBMaxs().z)
+		self.viewLerpAng = ang
+	end
 
-	view.origin = viewLerpVec
-	view.angles = viewLerpAng
+	self.viewLerpVec = LerpVector(FT,self.viewLerpVec,pos)
+	self.viewLerpAng = LerpAngle(FT,self.viewLerpAng,ang)
+
+	view.origin = self.viewLerpVec
+	view.angles = self.viewLerpAng
 	return view
 end
 
@@ -120,13 +185,27 @@ SF.PaintCrosshair = function(self,HitPlane,HitPilot)
 	local x,y = HitPlane.x,HitPlane.y
 	local x2,y2 = HitPilot.x,HitPilot.y
 	local scale = 60
+	local col = Color(0,255,63)
+
+	local throttle = self:GetThrottlePercent() *0.01
+	local rotor = self:GetRotorPos()
+	local warnDist = 6000
+	local tr = util.TraceLine({
+		start = rotor,
+		endpos = rotor +LocalPlayer():GetAngles():Forward() *math.Clamp(warnDist *throttle,1,warnDist *1.25),
+		filter = self
+	})
+	-- LocalPlayer():ChatPrint((warnDist *throttle))
+	if tr.HitSky then
+		col = Color(255,0,0,math.abs(math.cos(CurTime() *(10 *throttle))) *255)
+	end
 
 	surface.SetMaterial(cMat1)
-	surface.SetDrawColor(0,255,63)
+	surface.SetDrawColor(col.r,col.g,col.b,col.a)
 	surface.DrawTexturedRectRotated(x,y,scale,scale,0)
 
 	surface.SetMaterial(cMat2)	
-	surface.SetDrawColor(0,255,63)
+	surface.SetDrawColor(col.r,col.g,col.b,col.a)
 	surface.DrawTexturedRectRotated(x2 +1,y2 +1,scale,scale,0)
 end
 
@@ -225,11 +304,11 @@ SF.PlayVO = function(ply,snd,VO)
 	local snd = VJ_PICK(snd)
 	if !snd then return end
 	local snddur = SoundDuration(snd) +1
+	ply.SF_TalkTexture = Material("hud/starfox/vo_" .. (SF_AI_TRANSLATE_TEXTURE[VO] or VO) .. ".vtf")
 	ply.SF_TalkT = CurTime() +snddur
 	ply.SF_NextTalkT = ply.SF_TalkT +0.2
 	ply.SF_CurrentSound = snd
 	ply.SF_CurrentVO = VO
-	ply.SF_TalkTexture = Material("hud/starfox/vo_" .. VO .. ".vtf")
 
 	ply:EmitSound("cpthazama/starfox/64/RadioTransmissionon.wav",110,100,1)
 	ply:EmitSound(snd,110,100,1)
@@ -266,6 +345,12 @@ SF.PlaySound = function(sndType,ent,snd,vol,pit,delay,cache)
 end
 
 SF.AddSound = function(name,snd,lvl,chan)
+	for _,v in pairs(SF.CachedSounds) do
+		if v.Name == name then
+			return
+		end
+	end
+
 	sound.Add({
 		name = name,
 		channel = chan or CHAN_STATIC,
@@ -278,7 +363,9 @@ SF.AddSound = function(name,snd,lvl,chan)
 end
 
 SF.AddSound("LFS_SF_ARWING_ENGINE","cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav",125)
+SF.AddSound("LFS_SF_ARWING_ENGINE_NEW","cpthazama/starfox/vehicles/arwing_eng_hd.wav",125)
 SF.AddSound("LFS_SF_ARWING_ENGINE2","cpthazama/starfox/vehicles/arwing_eng.wav",90)
+SF.AddSound("LFS_SF_ARWING_ENGINE_BOOST","cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav",125)
 SF.AddSound("LFS_SF_ARWING_BOOST","cpthazama/starfox/vehicles/arwing_eng_boost_short.wav",125)
 SF.AddSound("LFS_SF_ARWING_PRIMARY","cpthazama/starfox/vehicles/arwing_laser_single_hit.wav",95,CHAN_WEAPON)
 SF.AddSound("LFS_SF_ARWING_PRIMARY_CHARGED","cpthazama/starfox/vehicles/arwing_fire_charged.wav",95,CHAN_WEAPON)
@@ -337,9 +424,9 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 
 	if !lockOn then return end
 	if self:GetAI() then
-		local enemy = SF.FindEnemy(self)
+		local enemy = self:AIGetTarget() or SF.FindEnemy(self)
 		if IsValid(enemy) then
-			if enemy.OnEngineStarted then -- Must be a LFS or Simfphys entity
+			if enemy.GetDriverSeat then -- Must be a LFS or Simfphys entity
 				ent:SetLockOn(enemy)
 				ent:SetStartVelocity(0)
 			end
@@ -348,7 +435,7 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 		if tr.Hit then
 			local Target = tr.Entity
 			if IsValid(Target) then
-				if Target.OnEngineStarted && Target != self then
+				if Target.GetDriverSeat && Target != self then
 					ent:SetLockOn(Target)
 					ent:SetStartVelocity(0)
 				end
@@ -436,6 +523,7 @@ SF.OnDestroyed = function(self,spawnChance)
 end
 
 SF.OnTakeDamage = function(self,dmginfo)
+	if self.GetInvincible && self:GetInvincible() then return end
 	self:TakePhysicsDamage( dmginfo )
 
 	self:StopMaintenance()

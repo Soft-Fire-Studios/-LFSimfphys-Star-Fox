@@ -9,6 +9,17 @@ ENT.VO_DeathSound = false -- Did they run the death sound code yet?
 ENT.Lines = {}
 ENT.LinesDeath = {}
 
+if CLIENT then
+	net.Receive("SF_PlayVO",function(len,pl)
+		local ent = net.ReadEntity()
+		local snd = net.ReadString()
+		local chance = net.ReadFloat(32) or 30
+		local stopAll = net.ReadBool() or false
+
+		ent:DoVOSound(snd,chance,stopAll)
+	end)
+end
+
 local lerpColor = Vector(0,255,63)
 local lerpColor2 = Vector(0,255,63)
 local lerpColor3 = Vector(255,93,0)
@@ -19,7 +30,7 @@ hook.Add("HUDPaint","StarFox_AI",function()
 
 	ply.SF_NextTalkT = ply.SF_NextTalkT or 0
 	ply.SF_TalkT = ply.SF_TalkT or 0
-	ply.SF_TalkTexture = ply.SF_TalkTexture or nil
+	ply.SF_TalkTexture = ply.SF_TalkTexture or Material("hud/starfox/vo_blank.vtf")
 	ply.SF_CurrentVO = ply.SF_CurrentVO or nil
 	ply.SF_CurrentVOEntity = ply.SF_CurrentVOEntity or NULL
 	ply.SF_CurrentSound = ply.SF_CurrentSound or nil
@@ -118,7 +129,7 @@ hook.Add("HUDPaint","StarFox_AI",function()
 	draw.RoundedBox(1,x *1.0114,y,barLength /2,barHeight *throttlePercent,Color(lerpColor3.x,lerpColor3.y,lerpColor3.z))
 end)
 
-function ENT:DoVOSound()
+function ENT:DoVOSound(snd,chance,stopOthers)
 	for _,ply in RandomPairs(player.GetAll()) do
 		local plyTeam = ply:lfsGetAITeam()
 		local team = self:GetNW2Int("Team")
@@ -128,12 +139,21 @@ function ENT:DoVOSound()
 			-- if !IsValid(vehicle) then continue end
 			local VO = self:GetNW2String("VO")
 			if !VO then continue end
-			self.SF_NextTalkT = self.SF_NextTalkT or CurTime() +math.Rand(5,10)
+			self.SF_NextTalkT = self.SF_NextTalkT or CurTime() +0.5
 			ply.SF_NextTalkT = ply.SF_NextTalkT or 0
 			ply.SF_TalkT = ply.SF_TalkT or 0
 			ply.SF_TalkTexture = ply.SF_TalkTexture or nil
-			if CurTime() > self.SF_NextTalkT && CurTime() > ply.SF_NextTalkT && math.random(1,100) < 30 then
-				local snddur = SF.PlayVO(ply,SF.GetVOLine(self,VO),VO)
+			if chance == 100 then
+				self.SF_NextTalkT = 0
+			end
+			if stopOthers then
+				self.SF_NextTalkT = 0
+				ply.SF_NextTalkT = 0
+				ply.SF_TalkT = 0
+				ply.SF_TalkTexture = nil
+			end
+			if CurTime() > self.SF_NextTalkT && CurTime() > ply.SF_NextTalkT && math.random(1,100) < (chance or 30) then
+				local snddur = SF.PlayVO(ply,snd or SF.GetVOLine(self,VO),VO)
 				if snddur == nil then continue end
 				ply.SF_CurrentVOEntity = self
 				self.SF_NextTalkT = CurTime() +snddur +math.Rand(15,40)

@@ -14,6 +14,8 @@ ENT.MissionType = 1 -- 0 = None, 1 = Assault, 2 = War Zone, 3 = Escort, 4 = Vers
 ENT.MissionForceTeam = true
 ENT.MissionTeam = SF_AI_TEAM_CORNERIA
 
+SF.AddMissionData(1,ENT.PrintName,ENT.Instructions,"entities/lfs_starfox_mission_assault_1.png",false)
+
 ENT.Spawnable = true
 ENT.AdminOnly = true
 
@@ -91,12 +93,10 @@ function ENT:StartAssaultMission()
 			v:SelectWeapon("weapon_physgun")
 			local sPos = self:GetSpawnPos(500,10)
 			if sPos then
-				local veh = self:SpawnVehicle(v:GetInfo("lfs_sf_ship"),sPos,false)
-				-- local veh = self:SpawnVehicle("lfs_starfox_" .. v:GetInfo("lfs_sf_ship"),sPos,false)
+				local veh = self:SpawnVehicle(v:GetInfo("lfs_sf_currentship"),sPos,false)
 				if self.MissionForceTeam then
 					veh:SetAITEAM(self.MissionTeam)
 				end
-				-- local veh = self:SpawnVehicle("lfs_starfox_arwing",sPos,false)
 				timer.Simple(0,function()
 					veh:SetPassenger(v)
 					veh:ToggleEngine()

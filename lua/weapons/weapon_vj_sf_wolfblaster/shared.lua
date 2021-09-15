@@ -15,6 +15,11 @@ SWEP.SlotPos					= 3 -- Which part of that slot do you want the SWEP to be in? (
 SWEP.UseHands					= true
 SWEP.ViewModelFOV = 44
 end
+
+SWEP.WorldModel_UseCustomPosition = true -- Should the gun use custom position? This can be used to fix guns that are in the crotch
+SWEP.WorldModel_CustomPositionAngle = Vector(-10,0,180)
+SWEP.WorldModel_CustomPositionOrigin = Vector(-1,3,0)
+
 	-- NPC Settings ---------------------------------------------------------------------------------------------------------------------------------------------
 SWEP.NPC_NextPrimaryFire 		= 0.3 -- Next time it can use primary fire
 SWEP.NPC_ReloadSound			= {"vj_weapons/blaster/blaster_reload.wav"} -- Sounds it plays when the base detects the SNPC playing a reload animation

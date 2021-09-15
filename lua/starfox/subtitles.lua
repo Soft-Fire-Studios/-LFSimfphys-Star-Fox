@@ -8,7 +8,7 @@ print("Loading [LFSimfphys] Star Fox Subtitles file...")
 
 SF_SUBTITLES = {}
 
-    // Wolf (Zero)
+    // Wolf (64)
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/WollfCant let you do that.mp3"] = "Can't let you do that, Star Fox."
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/WolfPlaytimes over.mp3"] = "Playtime is over, Star Fox."
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/Wolfgoing down.mp3"] = "You're in my sights, you're going down!"
@@ -21,6 +21,38 @@ SF_SUBTITLES["cpthazama/starfox/vo/wolf/Wolfyoure not so tough.mp3"] = "You're n
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/WollfDont get too cocky.mp3"] = "Don't get too cocky, Star Fox."
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/WollfI cant lose.mp3"] = "I can't lose!"
 SF_SUBTITLES["cpthazama/starfox/vo/wolf/Wollflooks like we win.mp3"] = "Looks like we win today, Star Fox."
+
+    // Wolf (Zero)
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/GO.wav"] = "Go!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/bested_by_a_fox.wav"] = "Bested by a fox?! Impossible!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/come_on.wav"] = "Come on!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/even_trying.wav"] = "Are you even trying?"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/father_put_up_more_fight.wav"] = "What's wrong? Your father put up more of a fight."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/grown_tired.wav"] = "I've grown tired of this!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/hunt_you_down.wav"] = "Wherever you go, I will hunt you down!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/i_cant_lose.wav"] = "I- can't lose!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/i_have_you_in_my_sights.wav"] = "I have you in my sights, you've no escape!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/im_coming_for_you.wav"] = "I'm coming for you, Star Fox."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/im_impressed.wav"] = "I'm impressed. I haven't had this much fun since I fought your father."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/laugh.wav"] = "HYAHAHAHAHAAAA!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/lightning_blaster.wav"] = "Lightning Blaster!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/lightning_tornado.wav"] = "Lightning Tornado!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/not_good_enough.wav"] = "You're good, but not good enough!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/not_so_tough.wav"] = "You're not so tough!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/orbital_wolf.wav"] = "Orbital Wolf!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/pathetic.wav"] = "Pathetic."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/playtime_is_over.wav"] = "Playtime is over, Star Fox."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/shadow_edge.wav"] = "Shadow Edge!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/so_clever.wav"] = "You think you're so clever."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/take_this.wav"] = "Take this!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/that_tickled.wav"] = "That almost tickled!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/thats_as_far_as_you_go.wav"] = "That's as far as you go, Star Fox."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/the_best_you_can_do.wav"] = "Is that the best you can do?"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/too_easy.wav"] = "Too easy."
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/too_slow.wav"] = "Too slow!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/what.wav"] = "What?!"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/whats_wrong.wav"] = "What's wrong? Is that all you've got?"
+SF_SUBTITLES["cpthazama/starfox/vo/wolf_zero/youll_see_father_soon.wav"] = "You'll be seeing your father soon!"
 
     // Wolf (Assault)
 SF_SUBTITLES["cpthazama/starfox/vo/wolf_assault/accept_the_truth.wav"] = "That's the truth of it, accept it Fox."

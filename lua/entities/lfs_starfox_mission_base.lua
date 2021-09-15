@@ -34,6 +34,7 @@ ENT.Category 		= "[LFS] Star Fox - Missions"
 ENT.MissionType = 0 -- 0 = None, 1 = Assault, 2 = War Zone, 3 = Escort, 4 = Versus
 ENT.MissionForceTeam = false
 ENT.MissionTeam = SF_AI_TEAM_CORNERIA
+ENT.MissionMap = false // gm_cruisercanyon
 
 ENT.Spawnable = false
 ENT.AdminOnly = false
@@ -117,6 +118,14 @@ function ENT:Initialize()
 
 	for _,v in pairs(ents.FindByClass(self:GetClass())) do
 		if v != self then
+			self:Remove()
+			return
+		end
+	end
+
+	if self.MissionMap then
+		if game.GetMap() != self.MissionMap then
+			Entity(1):ChatPrint("You must be playing on " .. self.MissionMap .. " to play this mission!")
 			self:Remove()
 			return
 		end
