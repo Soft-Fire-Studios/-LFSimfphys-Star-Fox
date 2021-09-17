@@ -21,5 +21,8 @@
 	"$rimlightboost"   				"1"
 	"$rimmask"     					"1"
 
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.4 0.25 0.25]"
+
 	"$lightwarptexture"				"models/cpthazama/starfox/warp2"
 }

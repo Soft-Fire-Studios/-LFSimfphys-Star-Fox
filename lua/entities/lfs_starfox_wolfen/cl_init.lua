@@ -109,25 +109,13 @@ function ENT:Draw()
 		render.DrawSprite(self:GetAttachment(5).Pos,300,300,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
 	end
 	
-	-- if not self:GetEngineActive() then return end
+	if not self:GetEngineActive() then return end
 	
-	-- local Boost = self.BoostAdd or 0
-	
-	-- local Size = 80 + (self:GetRPM() / self:GetLimitRPM()) * 300 + Boost
-	-- local Mirror = false
+	local Boost = self.BoostAdd or 0
+	local Size = 800 + (self:GetRPM() /self:GetLimitRPM()) *400 + Boost
 
-	-- local pos = self:LocalToWorld(Vector(-80,0,180))
-	-- render.SetMaterial(mat)
-	-- render.DrawSprite(pos,Size,Size,Color(0,127,255,255))
-
-	-- Size = 80 + (self:GetRPM() / self:GetLimitRPM()) * 120 + Boost
-	-- for i = 0,1 do
-	-- 	local Sub = Mirror and 1 or -1
-	-- 	pos = self:LocalToWorld(Vector(-70,101 *Sub,225))
-	-- 	render.SetMaterial(mat)
-	-- 	render.DrawSprite(pos,Size,Size,Color(0,255,0,255))
-	-- 	Mirror = true
-	-- end
+	render.SetMaterial(Material("sprites/glow04_noz_gmod"))
+	render.DrawSprite(self:GetAttachment(4).Pos +self:GetForward() *-45,Size,Size,Color(192,153,255))
 end
 
 local function BoneData(self,bone)
@@ -233,9 +221,9 @@ function ENT:ExhaustFX()
 		local emitter = ParticleEmitter( self:GetPos(), false )
 		
 		if emitter then
-			local top = BoneData(self,6)
-			local right = BoneData(self,5)
-			local left = BoneData(self,4)
+			local top = SF.BoneData(self,4)
+			local right = SF.BoneData(self,10)
+			local left = SF.BoneData(self,6)
 
 			local vOffset = self:LocalToWorld(Vector(-80,0,180))
 			local vNormal = -self:GetForward()
@@ -249,7 +237,7 @@ function ENT:ExhaustFX()
 				local pitchSub = (i < 2 && 1 or -0.65)
 				local sideSub = (i < 2 && 1 or -1)
 				local Side = (i == 2 && 1 or i == 3 && -1 or 0)
-				vOffset = bone.Pos +vNormal *40 + Vector(-25 *Side,0,0)
+				vOffset = bone.Pos +vNormal *40 + Vector(-20 *Side,0,20 *(i > 1 && 1 or 0))
 
 				local particle = emitter:Add(Material("particles/fire_glow_sf"), vOffset )
 				if not particle then return end
@@ -260,13 +248,13 @@ function ENT:ExhaustFX()
 				local vDir = vForward +(vUp *Sub)
 				local pitchChange = (vUp *(500 *fracMain)) *-pitchSub
 				
-				local size = 70 +(self.BoostAdd *0.4)
-				local misc = self:GetVelocity() +(i > 1 && vRight *(-600 *Side) or Vector(0,0,0))
+				local size = 80 +(self.BoostAdd *0.4)
+				local misc = self:GetVelocity() +(i > 1 && vRight *(-200 *Side) or Vector(0,0,0))
 				particle:SetVelocity(vDir *(i > 1 && 1300 or 800) +pitchChange +misc)
 				particle:SetGravity(Vector(0,0,0))
 				particle:SetAirResistance(5)
 				particle:SetLifeTime( 0 )
-				particle:SetDieTime( 0.15 )
+				particle:SetDieTime( 0.22 )
 				particle:SetStartAlpha(math.Clamp(255 *throttle,0,255))
 				particle:SetEndAlpha( 0 )
 				particle:SetStartSize( size )
@@ -325,12 +313,12 @@ function ENT:AnimFins()
 	local RPM = self:GetRPM()
 	local MaxRPM = self:GetMaxRPM()
 
-	local top = 6
-	local right = 5
-	local left = 4
+	local top = 4
+	local right = 10
+	local left = 6
 
-	local wingLeft = 7
-	local wingRight = 8
+	local wingLeft = 5
+	local wingRight = 9
 
 	-- self.smPitch = self.smPitch and self.smPitch + (Pitch - self.smPitch) * FT or 0
 	-- self.smYaw = self.smYaw and self.smYaw + (Yaw - self.smYaw) * FT or 0
@@ -341,6 +329,8 @@ function ENT:AnimFins()
 	local wingMovement = self.fracMain *0.5
 	self:ManipulateBoneAngles(wingLeft,Angle(-wingMovement,0,0))
 	self:ManipulateBoneAngles(wingRight,Angle(wingMovement,0,0))
+	self:ManipulateBoneAngles(7,Angle(wingMovement *1.2,0,0))
+	self:ManipulateBoneAngles(8,Angle(-wingMovement *1.2,0,0))
 
 	self:ManipulateBoneAngles(top,Angle(0,0,-20 -self.fracMain))
 	local bottom = self.fracMain *0.5

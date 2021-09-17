@@ -21,27 +21,32 @@ ENT.AITEAM = 2
 ENT.SF_HasSmartBombs = true
 
 ENT.Mass = 2000
-ENT.Inertia = Vector(400000,400000,400000)
-ENT.Drag = -1
+ENT.Inertia = Vector(800000,800000,800000)
+ENT.Drag = -10
 
 ENT.HideDriver = false
 ENT.SeatPos = Vector(50,0,32)
 ENT.SeatAng = Angle(0,-90,0)
 
-ENT.WheelMass 		= 	325 -- wheel mass is 1 when the landing gear is retracted
-ENT.WheelRadius 	= 	60
-ENT.WheelPos_L 		= 	Vector(0,-120,-180)
-ENT.WheelPos_R 		= 	Vector(0,120,-180)
-ENT.WheelPos_C   	= 	Vector(150,0,-180)
+-- ENT.WheelMass 		= 	325 -- wheel mass is 1 when the landing gear is retracted
+-- ENT.WheelRadius 	= 	60
+-- ENT.WheelPos_L 		= 	Vector(0,-120,-180)
+-- ENT.WheelPos_R 		= 	Vector(0,120,-180)
+-- ENT.WheelPos_C   	= 	Vector(150,0,-180)
 
 ENT.IdleRPM = 1
 ENT.MaxRPM = 3600
 ENT.LimitRPM = 4400
 
+-- ENT.RotorPos = Vector(490,0,10)
+-- ENT.WingPos = Vector(-50,0,10)
+-- ENT.ElevatorPos = Vector(-270,0,10)
+-- ENT.RudderPos = Vector(-270,0,10)
+
 ENT.RotorPos = Vector(490,0,10)
-ENT.WingPos = Vector(-50,0,10)
-ENT.ElevatorPos = Vector(-270,0,10)
-ENT.RudderPos = Vector(-270,0,10)
+ENT.WingPos = Vector(100,0,10)
+ENT.ElevatorPos = Vector(-200,0,10)
+ENT.RudderPos = Vector(-200,0,10)
 
 ENT.MaxVelocity = 4400
 

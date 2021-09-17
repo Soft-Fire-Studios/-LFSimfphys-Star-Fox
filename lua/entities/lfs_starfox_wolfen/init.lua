@@ -147,7 +147,7 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	if RPM <= MaxRPM *0.05 then
 		SafeRemoveEntity(self.Trail)
 	elseif self.CanUseTrail && !IsValid(self.Trail) && RPM > MaxRPM *0.05 then
-		local size = 1000
+		local size = 2000
 		self.Trail = util.SpriteTrail(self, 4, Color(192,153,255), false, size, 0, 3, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
 	end
 	local Driver = self:GetDriver()
