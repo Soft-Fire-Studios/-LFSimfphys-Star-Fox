@@ -276,30 +276,53 @@ function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 		self.ENG:ChangePitch(pitch)
 		self.ENG:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
 	end
-	-- if self.ENG2 then
-		-- self.ENG2:ChangePitch(  math.Clamp(math.Clamp(  50 + Pitch * 50, 50,255) + Doppler,0,255) )
-		-- self.ENG2:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
-	-- end
+	if self.ENG2 then
+		self.ENG2:ChangePitch(pitch)
+		self.ENG2:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0.5,1) )
+	end
+
+	local ply = self:GetDriver()
+	if !ply:IsPlayer() then return end
+	local seat = ply:GetVehicle()
+	if !self.INT then return end
+	if IsValid(seat) && !seat:GetThirdPersonMode() then
+		self.INT:ChangePitch(self.ENG:GetPitch())
+		self.INT:ChangeVolume(self.ENG:GetVolume())
+		self.ENG:ChangeVolume(0)
+	else
+		self.INT:ChangePitch(0)
+		self.INT:ChangeVolume(0)
+	end
 end
 
 function ENT:EngineActiveChanged( bActive )
 	if bActive then
-		self.ENG = CreateSound( self, "LFS_SF_WOLFEN_ENGINE" )
+		self.ENG = CreateSound( self, "LFS_SF_WOLFEN_ENGINE_NEW" )
 		self.ENG:PlayEx(0,0)
-		-- self.ENG2 = CreateSound( self, "LFS_SF_ARWING_ENGINE2" )
-		-- self.ENG2:PlayEx(0,0)
+		self.ENG2 = CreateSound( self, "LFS_SF_ARWING_ENGINE_NEW" )
+		self.ENG2:PlayEx(0,0)
+		self.INT = CreateSound(self,"LFS_SF_WOLFEN_ENGINE_INTERIOR")
+		self.INT:PlayEx(0,0)
 	else
 		if self.ENG then
 			self.ENG:Stop()
+		end
+		if self.ENG2 then
+			self.ENG2:Stop()
+		end
+		if self.INT then
+			self.INT:Stop()
 		end
 	end
 end
 
 function ENT:OnRemove()
+	if self.INT then
+		self.INT:Stop()
+	end
 	if self.ENG2 then
 		self.ENG2:Stop()
 	end
-	
 	if self.ENG then
 		self.ENG:Stop()
 	end
@@ -332,7 +355,7 @@ function ENT:AnimFins()
 	self:ManipulateBoneAngles(7,Angle(wingMovement *1.2,0,0))
 	self:ManipulateBoneAngles(8,Angle(-wingMovement *1.2,0,0))
 
-	self:ManipulateBoneAngles(top,Angle(0,0,-20 -self.fracMain))
+	self:ManipulateBoneAngles(top,Angle(0,0,-20 -(self.fracMain *1.45)))
 	local bottom = self.fracMain *0.5
 	self:ManipulateBoneAngles(left,Angle(-self.fracMain *1.25,bottom,self.fracMain *0.1))
 	self:ManipulateBoneAngles(right,Angle(self.fracMain *1.25,-bottom,self.fracMain *0.1))

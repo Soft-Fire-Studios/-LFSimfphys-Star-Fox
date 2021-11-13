@@ -19,8 +19,11 @@ local Materials = {
 
 function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
+	local Col2 = data:GetAngles()
+	local Col = data:GetEntity():GetSpriteColor()
 	local IsLaser = data:GetDamageType() == 1 && true or false
 	self.IsLaser = IsLaser
+	self.Col = Col
 
 	self.DieTime = CurTime() + 1
 
@@ -89,6 +92,9 @@ function EFFECT:Explosion( pos , scale )
 				else
 					particle:SetColor(40,40,40)
 				end
+				if self.Col then
+					particle:SetColor(self.Col.r,self.Col.g,self.Col.b)
+				end
 				particle:SetGravity( Vector( 0, 0, 100 ) )
 				particle:SetCollide( false )
 			end
@@ -109,6 +115,9 @@ function EFFECT:Explosion( pos , scale )
 					particle:SetColor(255,0,0)
 				else
 					particle:SetColor(200,150,150)
+				end
+				if self.Col then
+					particle:SetColor(self.Col.r,self.Col.g,self.Col.b)
 				end
 				particle:SetCollide( false )
 			end
@@ -134,6 +143,11 @@ function EFFECT:Explosion( pos , scale )
 			dlight.brightness = 20
 			dlight.Size = 1000
 			dlight.DieTime = CurTime() + 1
+		end
+		if self.Col then
+			dlight.r = self.Col.r
+			dlight.g = self.Col.g
+			dlight.b = self.Col.b
 		end
 		dlight.Decay = 2000
 	end

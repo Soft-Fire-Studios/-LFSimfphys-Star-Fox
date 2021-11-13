@@ -68,8 +68,8 @@ function ENT:FireTurret(num,targetPos)
 	local trace = util.TraceHull({
 		start = startpos,
 		endpos = targetPos or (startpos +EyeAngles:Forward() *50000),
-		mins = Vector(-10,-10,-10),
-		maxs = Vector(10,10,10),
+		mins = Vector(-2,-2,-2),
+		maxs = Vector(2,2,2),
 		-- filter = self
 	})
 
@@ -80,11 +80,13 @@ function ENT:FireTurret(num,targetPos)
 	if heat >= 1000 then return end
 	if hasAI && CurTime() < heatAIWaitT then return end
 	if trace.Entity && trace.Entity == self then return end
+	local dist = GetConVar("lfs_bullet_max_range"):GetInt()
+	if targetPos:Distance(startpos) > dist then return end
 
 	local bullet = {}
 	bullet.Num 		= 1
 	bullet.Src 		= startpos
-	bullet.Dir 		= (trace.HitPos -startpos):GetNormalized()
+	bullet.Dir 		= (trace.HitPos -startpos):GetNormalized() *dist
 	bullet.Spread 	= Vector(0,0,0)
 	bullet.Tracer	= 1
 	bullet.TracerName = "lfs_sf_laser_venom"

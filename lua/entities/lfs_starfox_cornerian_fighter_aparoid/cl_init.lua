@@ -21,6 +21,14 @@ end
 local mat = Material( "sprites/light_glow02_add" )
 function ENT:Draw()
 	self:DrawModel()
+	
+	if not self:GetEngineActive() then return end
+
+	local Boost = self.BoostAdd or 0
+	local Size = 350 + (self:GetRPM() /self:GetLimitRPM()) *400 + Boost
+
+	render.SetMaterial(Material("sprites/glow04_noz_gmod"))
+	render.DrawSprite(self:GetAttachment(2).Pos +self:GetForward() *-20,Size,Size,Color(192,153,255))
 end
 
 local function BoneData(self,bone)

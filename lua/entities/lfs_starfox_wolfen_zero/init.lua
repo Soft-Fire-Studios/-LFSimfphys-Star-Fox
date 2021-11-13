@@ -48,7 +48,7 @@ function ENT:PrimaryAttack()
 	-- self:SetNextPrimary(0.15)
 
 	local upgrade = SF.GetLaser(self,"lfs_sf_laser_red")
-	for i = 1,2 do		
+	for i = 1,2 do
 		local bullet = {}
 		bullet.Num 		= 1
 		bullet.Src 		= self:GetAttachment(i).Pos

@@ -7,6 +7,34 @@ SF.CachedSounds = SF.CachedSounds or {}
 SF.AITurrets = SF.AITurrets or {}
 SF.MissionData = SF.MissionData or {}
 SF.ShipData = SF.ShipData or {}
+SF.GachaData = SF.GachaData or {}
+SF.GachaData.Pilots = {
+	"Fox McCloud",
+	"Falco Lombardi",
+	"Slippy Toad",
+	"Peppy Hare",
+	"Krystal",
+	"Bill Grey",
+	"Dash Bowman",
+	"James McCloud",
+	"Katt Monroe",
+	"Wolf O'Donnell",
+	"Leon Powalski",
+	"Andrew Oikonny",
+	"Pigma Dengar",
+	"Falyf",
+	"Fara Phoenix",
+	"Fay",
+	"General Scales",
+	"Zako",
+	"Zazan",
+	"Octoman",
+	"Miyu",
+	"Colonel Harrion",
+	"Rilkey  Grizz",
+	"Gisata",
+	"Kate O'Donnell"
+}
 
 local function GetPlyName(ply)
 	return string.gsub(ply:SteamID(),":","_")
@@ -38,6 +66,11 @@ SF.AddShipData = function(ship,name,mdl,health,shield,ammo1,ammo2,bio,unlockLeve
 end
 
 SF.AddMissionData = function(id,name,desc,icon,isBad)
+	for _,v in pairs(SF.MissionData) do
+		if v.Name == name then
+			return
+		end
+	end
 	SF.MissionData[#SF.MissionData +1] = {
 		ID = id,
 		Name = name,
@@ -45,6 +78,39 @@ SF.AddMissionData = function(id,name,desc,icon,isBad)
 		Icon = icon,
 		IsBad = isBad,
 	}
+end
+
+SF.Gamble = function(ply)
+	local rates = {}
+	rates.Pilots = 3 *SF_GACHA_RATE_PILOTS
+	rates.ShipParts = 30 *SF_GACHA_RATE_PARTS
+
+	local chance = math.random(1,100)
+	if chance <= rates.Pilots then -- Pilots
+		local pilot = VJ_PICK(SF.GachaData.Pilots)
+		-- ply:AddPilot(pilot)
+		local mes = "You've obtained a new Pilot, " .. pilot .. "!"
+		ply:PrintMessage(HUD_PRINTTALK,"[Katt's Lylat Shop] " .. mes)
+		ply:SetNW2String("SFMenu_LastGachaMessage",mes)
+	elseif chance <= rates.ShipParts && chance > rates.Pilots then -- Parts
+		local ship = false
+		for _,data in RandomPairs(SF.ShipData) do
+			ship = data
+			break
+		end
+		if !ship then return end
+		local amount = math.random(1,6 *SF_GACHA_MULT_PART)
+		SF.SetParts(ply,amount,true,ship.ID)
+		local mes = "You've obtained " .. amount .. "x " .. ship.Name .. " parts!"
+		ply:PrintMessage(HUD_PRINTTALK,"[Katt's Lylat Shop] " .. mes)
+		ply:SetNW2String("SFMenu_LastGachaMessage",mes)
+	elseif chance > rates.ShipParts then -- XP
+		local amount = math.random(50,375 *SF_GACHA_MULT_XP)
+		SF.SetXP(ply,amount,true)
+		local mes = "You've obtained " .. amount .. " XP!"
+		ply:PrintMessage(HUD_PRINTTALK,"[Katt's Lylat Shop] " .. mes)
+		ply:SetNW2String("SFMenu_LastGachaMessage",mes)
+	end
 end
 
 SF.GetReqXP = function(lvl)
@@ -364,6 +430,7 @@ end
 
 SF.AddSound("LFS_SF_ARWING_ENGINE","cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav",125)
 SF.AddSound("LFS_SF_ARWING_ENGINE_NEW","cpthazama/starfox/vehicles/arwing_eng_hd.wav",125)
+SF.AddSound("LFS_SF_ARWING_ENGINE_INTERIOR","cpthazama/starfox/vehicles/arwing_eng_hd_interior.wav",125)
 SF.AddSound("LFS_SF_ARWING_ENGINE2","cpthazama/starfox/vehicles/arwing_eng.wav",90)
 SF.AddSound("LFS_SF_ARWING_ENGINE_BOOST","cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav",125)
 SF.AddSound("LFS_SF_ARWING_BOOST","cpthazama/starfox/vehicles/arwing_eng_boost_short.wav",125)
@@ -371,14 +438,20 @@ SF.AddSound("LFS_SF_ARWING_PRIMARY","cpthazama/starfox/vehicles/arwing_laser_sin
 SF.AddSound("LFS_SF_ARWING_PRIMARY_CHARGED","cpthazama/starfox/vehicles/arwing_fire_charged.wav",95,CHAN_WEAPON)
 SF.AddSound("LFS_SF_ARWING_PRIMARY_DOUBLE","cpthazama/starfox/vehicles/arwing_laser_double.wav",95,CHAN_WEAPON)
 
+SF.AddSound("LFS_SF_WOLFEN_ENGINE_NEW","cpthazama/starfox/vehicles/wolfen.wav",125)
 SF.AddSound("LFS_SF_WOLFEN_ENGINE","cpthazama/starfox/vehicles/arwing_loop_hover.wav",125)
 SF.AddSound("LFS_SF_WOLFEN_ENGINE2","cpthazama/starfox/vehicles/wolfen_loop.wav",90)
 SF.AddSound("LFS_SF_WOLFEN_BOOST","cpthazama/starfox/vehicles/wolfen_boost2_a.wav",125)
 SF.AddSound("LFS_SF_WOLFEN_BOOST2","cpthazama/starfox/vehicles/wolfen_boost.wav",90)
 
+SF.AddSound("LFS_SF_BIGSHIP_ENGINE","cpthazama/starfox/vehicles/bigship_engine.wav",125)
+
+SF.AddSound("LFS_SF_WOLFEN_ENGINE_INTERIOR","cpthazama/starfox/vehicles/wolfen_interior.wav",125)
+
 SF.AddSound("LFS_SF_APAROID_MISSILE","cpthazama/starfox/vehicles/se_apa-0003_06.wav",90)
 
 SF.AddSound("LFS_SF_GENERIC_ENGINE","cpthazama/starfox/vehicles/generic_loop.wav",125)
+SF.AddSound("LFS_SF_GENERIC_ENGINE_INTERIOR","cpthazama/starfox/vehicles/generic_loop_interior.wav",125)
 SF.AddSound("LFS_SF_GENERIC_EXPLOSION","cpthazama/starfox/vehicles/laser_hit.wav",125)
 SF.AddSound("LFS_SF_GENERIC_EXPLOSION7","cpthazama/starfox/64/Explosion7.wav",125)
 
@@ -393,7 +466,7 @@ SF.AddSound("LFS_SFEH_SHARPCLAW_FIRE","cpthazama/starfox/eh/w_sharpclawhyper1.wa
 SF.AddSound("LFS_SFEH_SOUL_UP","cpthazama/starfox/eh/w_soulup1.wav",125)
 
 SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
-	local startpos = self:GetRotorPos()
+	local startpos = self.GetRotorPos && self:GetRotorPos() or pos
 	local tr = util.TraceHull({
 		start = startpos,
 		endpos = (startpos +self:GetForward() *50000),
@@ -423,7 +496,7 @@ SF.FireProjectile = function(self,ent,pos,lockOn,funcPre,funcPost)
 	constraint.NoCollide(ent,self,0,0)
 
 	if !lockOn then return end
-	if self:GetAI() then
+	if self.GetAI && self:GetAI() then
 		local enemy = self:AIGetTarget() or SF.FindEnemy(self)
 		if IsValid(enemy) then
 			if enemy.GetDriverSeat then -- Must be a LFS or Simfphys entity
@@ -539,7 +612,7 @@ SF.OnTakeDamage = function(self,dmginfo)
 
 		self:SetNextShieldRecharge( 3 )
 
-		if self:GetMaxShield() > 0 and self:GetShield() > 0 then
+		if self:GetMaxShield() > 0 && self:GetShield() > 0 then
 			dmginfo:SetDamagePosition( dmgPos + dmgNormal * 250 * self:GetShieldPercent() )
 
 			local effectdata = EffectData()
@@ -564,7 +637,7 @@ SF.OnTakeDamage = function(self,dmginfo)
 
 	SF.OnDamage(self,dmginfo)
 	
-	if NewHealth <= 0 and not (self:GetShield() > Damage and ShieldCanBlock) then
+	if NewHealth <= 0 && not (self:GetShield() > Damage && ShieldCanBlock) then
 		if not self:IsDestroyed() then
 			self.FinalAttacker = dmginfo:GetAttacker() 
 			self.FinalInflictor = dmginfo:GetInflictor()
@@ -572,7 +645,7 @@ SF.OnTakeDamage = function(self,dmginfo)
 			self:Destroy()
 			
 			self.MaxPerfVelocity = self.MaxPerfVelocity * 10
-			local ExplodeTime = self:IsSpaceShip() and (math.Clamp((self:GetVelocity():Length() - 250) / 500,1.5,8) * math.Rand(0.2,1)) or (self:GetAI() and 30 or 9999)
+			local ExplodeTime = self:IsSpaceShip() && (math.Clamp((self:GetVelocity():Length() - 250) / 500,1.5,8) * math.Rand(0.2,1)) or (self:GetAI() && 30 or 9999)
 			if self:IsGunship() then ExplodeTime = math.Rand(1,2) end
 
 			local effectdata = EffectData()
@@ -627,8 +700,8 @@ SF.FindEnemy = function(self)
 						local Plane = v:lfsGetPlane()
 						
 						if IsValid(Plane) then
-							-- if self:CanSee(Plane) and not Plane:IsDestroyed() and Plane != self then
-							if self:Visible(Plane) and not Plane:IsDestroyed() and Plane != self then
+							-- if self:CanSee(Plane) && not Plane:IsDestroyed() && Plane != self then
+							if self:Visible(Plane) && not Plane:IsDestroyed() && Plane != self then
 								local HisTeam = Plane:GetAITEAM()
 								if HisTeam != 0 && (HisTeam != MyTeam or HisTeam == 3) then
 									ClosestTarget = v
@@ -671,13 +744,13 @@ SF.FindEnemy = function(self)
 	self.FoundPlanes = simfphys.LFS:PlanesGetAll()
 	
 	for _,v in pairs(self.FoundPlanes) do
-		if IsValid(v) and v != self and v.LFS then
+		if IsValid(v) && v != self && v.LFS then
 			local Dist = (v:GetPos() - MyPos):Length()
-			if Dist < TargetDistance /*and self:AITargetInfront(v,100)*/ then
-				if not v:IsDestroyed() and v.GetAITEAM then
+			if Dist < TargetDistance /*&& self:AITargetInfront(v,100)*/ then
+				if not v:IsDestroyed() && v.GetAITEAM then
 					local HisTeam = v:GetAITEAM()
 					if HisTeam != 0 && (HisTeam != self:GetAITEAM() or HisTeam == 3) then
-						-- if self:CanSee(v) then -- This function 9/10 times can never return true,if we use default Visible() function then they see enemies 10x better and its much more optimized than running hull traces
+						-- if self:CanSee(v) then -- This function 9/10 times can never return true,if we use default Visible() function then they see enemies 10x better && its much more optimized than running hull traces
 						if self:Visible(v) then
 							-- print(tostring(self) .. " Found plane: " .. tostring(v))
 							ClosestTarget = v
@@ -709,20 +782,13 @@ SF.AddAI = function(name,ent,att)
 			return
 		end
 
-		-- local self = NULL
-		-- for _,v in pairs(SF.AITurrets) do
-		-- 	if v.Name == name then
-		-- 		self = v
-		-- 		print("FOUND " .. tostring(v))
-		-- 		break
-		-- 	end
-		-- end
 		local self = SF.AITurrets[index] && SF.AITurrets[index].Name == name && SF.AITurrets[index] or nil
 		if self == nil then hook.Remove("Think",hookName) return end
 
 		local hasAI = ent:GetAI()
 		if !hasAI then return end -- Don't run the code if a player is driving the ship
 		local pos = ent:GetAttachment(att).Pos
+		-- local pos = ent:GetAttachment(att).Pos +ent:GetAttachment(att).Ang:Up() *15
 		local dist = GetConVar("lfs_bullet_max_range"):GetInt()
 		local team = ent:GetAITEAM()
 
@@ -741,7 +807,7 @@ SF.AddAI = function(name,ent,att)
 							local Plane = v:lfsGetPlane()
 							
 							if IsValid(Plane) then
-								if ent:Visible(Plane) and not Plane:IsDestroyed() and Plane != ent then
+								if ent:Visible(Plane) && not Plane:IsDestroyed() && Plane != ent then
 									local HisTeam = Plane:GetAITEAM()
 									if HisTeam != 0 then
 										if HisTeam != team or HisTeam == 3 then
@@ -770,11 +836,10 @@ SF.AddAI = function(name,ent,att)
 		ent.FoundPlanes = simfphys.LFS:PlanesGetAll()
 		
 		for _,v in pairs(ent.FoundPlanes) do
-			if IsValid(v) and v != ent and v.LFS then
+			if IsValid(v) && v != ent && v.LFS then
 				local Dist = (v:GetPos() - pos):Length()
-				
-				if Dist < TargetDistance and ent:AITargetInfront(v,100) then
-					if not v:IsDestroyed() and v.GetAITEAM then
+				if Dist < TargetDistance /*&& ent:AITargetInfront(v,100)*/ then
+					if not v:IsDestroyed() && v.GetAITEAM then
 						local HisTeam = v:GetAITEAM()
 						if HisTeam != 0 then
 							if HisTeam != team or HisTeam == 3 then

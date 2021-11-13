@@ -18,6 +18,18 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Float",0, "StartVelocity")
 end
 
+function ENT:SetSpriteColor(vec)
+	self:SetNW2Vector("SpriteColor",vec)
+end
+
+function ENT:GetSpriteColor(doRand)
+	local col = self:GetNW2Vector("SpriteColor",false)
+	if col != false then
+		return doRand && Color(math.Clamp(math.random(col.x -10,col.x +10),0,255),math.Clamp(math.random(col.y -10,col.y +10),0,255),math.Clamp(math.random(col.z -10,col.z +10),0,255),255) or Color(col.x,col.y,col.z)
+	end
+	return Color(255,0,0)
+end
+
 if SERVER then
 	function ENT:SpawnFunction(ply, tr, ClassName)
 		if not tr.Hit then return end
@@ -74,7 +86,7 @@ if SERVER then
 		end
 	end
 
-	function ENT:Initialize()	
+	function ENT:Initialize()
 		self:SetModel("models/cpthazama/starfox/items/smartbomb_proj.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -90,7 +102,7 @@ if SERVER then
 
 		self:PhysicsInitSphere(1,"metal")
 		if self:GetLaser() then
-			util.SpriteTrail(self,1,Color(255,0,0), false, 600, 0, 0.5, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
+			util.SpriteTrail(self,1,self:GetSpriteColor() or Color(255,0,0), false, 600, 0, 0.5, 1 /(10 +1) *0.5, "VJ_Base/sprites/vj_trial1.vmt")
 		end
 		
 		self.SpawnTime = CurTime()
@@ -204,8 +216,11 @@ if SERVER then
 	end
 
 	function ENT:Detonate()
+		local col = self:GetSpriteColor()
 		local effectdata = EffectData()
 			effectdata:SetOrigin(self:GetPos())
+			effectdata:SetAngles(Angle(col.x,col.y,col.z))
+			effectdata:SetEntity(self)
 			effectdata:SetDamageType(self:GetLaser() && 1 or 0)
 		util.Effect("lfs_sf_explosion", effectdata)
 
@@ -213,7 +228,7 @@ if SERVER then
 	end
 
 	function ENT:OnTakeDamage(dmginfo)	
-		if dmginfo:GetDamageType() ~= DMG_AIRBOAT then return end
+		if dmginfo:GetDamageType() != DMG_AIRBOAT then return end
 		
 		if self:GetAttacker() == dmginfo:GetAttacker() then return end
 		
@@ -237,7 +252,7 @@ else
 		if !laser then self:DrawModel() end
 
 		render.SetMaterial(laser && mat2 or mat)
-		render.DrawSprite(self:GetPos(),laser && 500 or 400,laser && 500 or 400,Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
+		render.DrawSprite(self:GetPos(),laser && 500 or 400,laser && 500 or 400,self:GetSpriteColor(true) or Color(math.random(240,255),math.random(10,20),math.random(10,20),255))
 	end
 
 	function ENT:SoundStop()

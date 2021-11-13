@@ -13,7 +13,7 @@ ENT.MDL = "models/cpthazama/starfox/vehicles/cornerian_fighter_aparoid.mdl"
 
 ENT.AITEAM = SF_AI_TEAM_APAROID
 
-ENT.SF_HasSmartBombs = true
+ENT.SF_HasSmartBombs = false
 
 ENT.Mass = 1000
 local inert = 200000
@@ -65,51 +65,3 @@ function ENT:AddDataTables()
 	self:NetworkVar("Int",2,"AITEAM",{KeyName = "aiteam",Edit = { type = "Int", order = 2,min = 0, max = 100, category = "AI"}})
 	self:NetworkVar("Float",21,"ChargeT")
 end
-
-sound.Add({
-	name = "LFS_SF_ARWING_ENGINE",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "cpthazama/starfox/vehicles/arwing_eng_boost_loop.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_ENGINE2",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	sound = "cpthazama/starfox/vehicles/arwing_eng.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_BOOST",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "cpthazama/starfox/vehicles/arwing_eng_boost_short.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_laser_single_hit.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY_CHARGED",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_fire_charged.wav"
-})
-
-sound.Add({
-	name = "LFS_SF_ARWING_PRIMARY_DOUBLE",
-	channel = CHAN_WEAPON,
-	volume = 1.0,
-	level = 95,
-	sound = "cpthazama/starfox/vehicles/arwing_laser_double.wav"
-})

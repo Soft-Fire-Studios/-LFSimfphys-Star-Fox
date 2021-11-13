@@ -1,0 +1,9 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/cpthazama/starfox/arwing_zero/misc"
+	"$bumpmap" 	"models/cpthazama/starfox/arwing_zero/misc_n"
+
+	"$alphatest" "1"
+	"$nodecal" "1"
+	"$nocull" "1"
+}

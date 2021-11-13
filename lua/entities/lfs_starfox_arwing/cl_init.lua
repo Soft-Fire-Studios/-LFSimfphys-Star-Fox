@@ -30,24 +30,12 @@ function ENT:Draw()
 	end
 	
 	if not self:GetEngineActive() then return end
-	
+
 	local Boost = self.BoostAdd or 0
-	
-	local Size = 80 + (self:GetRPM() / self:GetLimitRPM()) * 300 + Boost
-	local Mirror = false
+	local Size = 400 + (self:GetRPM() /self:GetLimitRPM()) *400 + Boost
 
-	local pos = self:LocalToWorld(Vector(-80,0,180))
-	render.SetMaterial(mat)
-	render.DrawSprite(pos,Size,Size,Color(0,127,255,255))
-
-	Size = 80 + (self:GetRPM() / self:GetLimitRPM()) * 120 + Boost
-	for i = 0,1 do
-		local Sub = Mirror and 1 or -1
-		pos = self:LocalToWorld(Vector(-70,101 *Sub,225))
-		render.SetMaterial(mat)
-		render.DrawSprite(pos,Size,Size,Color(0,255,0,255))
-		Mirror = true
-	end
+	render.SetMaterial(Material("sprites/glow04_noz_gmod"))
+	render.DrawSprite(self:GetAttachment(4).Pos +self:GetForward() *-20,Size,Size,Color(192,153,255))
 end
 
 local function BoneData(self,bone)
@@ -222,6 +210,19 @@ function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 			self.ENG2:ChangeVolume(0)
 		end
 	end
+
+	local ply = self:GetDriver()
+	if !ply:IsPlayer() then return end
+	local seat = ply:GetVehicle()
+	if !self.INT then return end
+	if IsValid(seat) && !seat:GetThirdPersonMode() then
+		self.INT:ChangePitch(self.ENG:GetPitch())
+		self.INT:ChangeVolume(self.ENG:GetVolume())
+		self.ENG:ChangeVolume(0)
+	else
+		self.INT:ChangePitch(0)
+		self.INT:ChangeVolume(0)
+	end
 	throttleLast = throttle
 end
 
@@ -231,6 +232,8 @@ function ENT:EngineActiveChanged( bActive )
 		self.ENG:PlayEx(0,0)
 		self.ENG2 = CreateSound(self,"LFS_SF_ARWING_ENGINE")
 		self.ENG2:PlayEx(0,0)
+		self.INT = CreateSound(self,"LFS_SF_ARWING_ENGINE_INTERIOR")
+		self.INT:PlayEx(0,0)
 	else
 		if self.ENG then
 			self.ENG:Stop()
@@ -238,14 +241,19 @@ function ENT:EngineActiveChanged( bActive )
 		if self.ENG2 then
 			self.ENG2:Stop()
 		end
+		if self.INT then
+			self.INT:Stop()
+		end
 	end
 end
 
 function ENT:OnRemove()
+	if self.INT then
+		self.INT:Stop()
+	end
 	if self.ENG2 then
 		self.ENG2:Stop()
 	end
-	
 	if self.ENG then
 		self.ENG:Stop()
 	end

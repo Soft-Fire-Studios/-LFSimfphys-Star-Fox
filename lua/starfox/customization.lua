@@ -5,9 +5,59 @@ local sfD = util.Decompress
 
 SF_C = SF_C or {}
 
+if CLIENT then
+    surface.CreateFont("StarFox_Default",{
+        font = "Arwing",
+        extended = false,
+        size = 15,
+        weight = 500,
+        blursize = 0,
+        scanlines = 0,
+        antialias = true,
+        underline = false,
+        italic = false,
+        strikeout = false,
+        symbol = false,
+        rotary = false,
+        shadow = false,
+        additive = false,
+        outline = false,
+    })
+
+    surface.CreateFont("StarFox_Combat",{
+        font = "Arwing",
+        extended = false,
+        size = 25,
+        weight = 500,
+        blursize = 0,
+        scanlines = 0,
+        antialias = true,
+        underline = false,
+        italic = false,
+        strikeout = false,
+        symbol = false,
+        rotary = false,
+        shadow = false,
+        additive = false,
+        outline = true,
+    })
+end
+
 concommand.Add("lfs_sf_unlockship",function(ply,cmd,args,argStr)
     local ship = args[1]
     SF.SetLockStatus(ply,ship,true)
+end)
+
+concommand.Add("lfs_sf_gacha",function(ply,cmd,args,argStr)
+    -- local ship = args[1]
+    local results = SF.Gamble(ply)
+end)
+
+concommand.Add("lfs_sf_gacha_b",function(ply,cmd,args,argStr)
+    -- local ship = args[1]
+    for i = 1,5 do
+        local results = SF.Gamble(ply)
+    end
 end)
 
 local function compress(d)
@@ -66,6 +116,10 @@ end
 net.Receive("SF_Menu",function(len,ply)
     local ply = LocalPlayer()
 
+    ply.SFMenu_Katt = ply.SFMenu_Katt or 0
+    ply.SFMenu_KattRand = ply.SFMenu_KattRand or 0
+    ply.SFMenu_LastMenuID = 0
+
     if GetConVar("lfs_sf_menumusic"):GetInt() == 1 then
         sound.PlayFile("sound/cpthazama/starfox/music/menu.mp3","noplay noblock",function(station,errCode,errStr)
             if IsValid(station) then
@@ -108,6 +162,20 @@ net.Receive("SF_Menu",function(len,ply)
             end
             return station
         end)
+
+        sound.PlayFile("sound/cpthazama/starfox/music/katt.mp3","noplay noblock",function(station,errCode,errStr)
+            if IsValid(station) then
+                station:EnableLooping(true)
+                station:Play()
+                -- station:SetVolume(0.6)
+                station:SetVolume(0)
+                station:SetPlaybackRate(1)
+                ply.SF_MenuTheme_Gacha = station
+            else
+                print("Error playing sound!",errCode,errStr)
+            end
+            return station
+        end)
     end
     
     local currentShip = LocalPlayer():GetInfo("lfs_sf_ship")
@@ -137,6 +205,9 @@ net.Receive("SF_Menu",function(len,ply)
             if IsValid(ply.SF_MenuTheme_Bad) && ply.SF_MenuTheme_Bad:GetState() == 1 then
                 ply.SF_MenuTheme_Bad:Stop()
             end
+            if IsValid(ply.SF_MenuTheme_Gacha) && ply.SF_MenuTheme_Gacha:GetState() == 1 then
+                ply.SF_MenuTheme_Gacha:Stop()
+            end
         end
     end
 
@@ -158,6 +229,10 @@ net.Receive("SF_Menu",function(len,ply)
                 ply.SF_MenuTheme_Bad:Pause()
                 ply.SF_MenuTheme_Bad:SetVolume(0)
             end
+            if IsValid(ply.SF_MenuTheme_Gacha) then
+                ply.SF_MenuTheme_Gacha:Pause()
+                ply.SF_MenuTheme_Gacha:SetVolume(0)
+            end
         elseif play == 1 && window.LastMusicState != 1 then
             window.LastMusicState = 1
             if IsValid(ply.SF_MenuTheme) then
@@ -171,6 +246,10 @@ net.Receive("SF_Menu",function(len,ply)
             if IsValid(ply.SF_MenuTheme_Bad) then
                 ply.SF_MenuTheme_Bad:Pause()
                 ply.SF_MenuTheme_Bad:SetVolume(0)
+            end
+            if IsValid(ply.SF_MenuTheme_Gacha) then
+                ply.SF_MenuTheme_Gacha:Pause()
+                ply.SF_MenuTheme_Gacha:SetVolume(0)
             end
         elseif play == 2 && window.LastMusicState != 2 then
             window.LastMusicState = 2
@@ -186,25 +265,30 @@ net.Receive("SF_Menu",function(len,ply)
                 ply.SF_MenuTheme_Bad:Play()
                 ply.SF_MenuTheme_Bad:SetVolume(0.6)
             end
+            if IsValid(ply.SF_MenuTheme_Gacha) then
+                ply.SF_MenuTheme_Gacha:Pause()
+                ply.SF_MenuTheme_Gacha:SetVolume(0)
+            end
+        elseif play == 3 && window.LastMusicState != 3 then
+            window.LastMusicState = 3
+            if IsValid(ply.SF_MenuTheme) then
+                ply.SF_MenuTheme:Pause()
+                ply.SF_MenuTheme:SetVolume(0)
+            end
+            if IsValid(ply.SF_MenuTheme_Good) then
+                ply.SF_MenuTheme_Good:Pause()
+                ply.SF_MenuTheme_Good:SetVolume(0)
+            end
+            if IsValid(ply.SF_MenuTheme_Bad) then
+                ply.SF_MenuTheme_Bad:Pause()
+                ply.SF_MenuTheme_Bad:SetVolume(0)
+            end
+            if IsValid(ply.SF_MenuTheme_Gacha) then
+                ply.SF_MenuTheme_Gacha:Play()
+                ply.SF_MenuTheme_Gacha:SetVolume(0.6)
+            end
         end
     end
-
-    local mdl = window:Add("DAdjustableModelPanel")
-    mdl:Dock(FILL)
-    -- mdl:SetFOV(85)
-    -- mdl:SetCamPos(vector_origin)
-	mdl:SetAmbientLight(Color( 255 * 0.3, 255 * 0.3, 255 * 0.3 ) )
-	mdl:SetDirectionalLight( BOX_FRONT, Color( 255 * 1.3, 255 * 1.3, 255 * 1.3 ) )
-	mdl:SetDirectionalLight( BOX_BACK, Color( 255 * 0.2, 255 * 0.2, 255 * 0.2 ) )
-	mdl:SetDirectionalLight( BOX_RIGHT, Color( 255 * 0.2, 255 * 0.2, 255 * 0.2 ) )
-	mdl:SetDirectionalLight( BOX_LEFT, Color( 255 * 0.2, 255 * 0.2, 255 * 0.2 ) )
-	mdl:SetDirectionalLight( BOX_TOP, Color( 255 * 2.3, 255 * 2.3, 255 * 2.3 ) )
-	mdl:SetDirectionalLight( BOX_BOTTOM, Color( 255 * 0.1, 255 * 0.1, 255 * 0.1 ) )
-    -- mdl:SetAmbientLight(Vector(-64,-64,-64))
-    -- mdl:SetAnimated(true)
-    mdl.FarZ = 32768
-    -- mdl.Angles = angle_zero
-    -- mdl:SetLookAt(Vector(0,0,0))
 
     local sheet = window:Add("DPropertySheet")
     sheet:Dock(LEFT)
@@ -213,8 +297,44 @@ net.Receive("SF_Menu",function(len,ply)
     local modelListPnl = window:Add("DPanel")
     modelListPnl:DockPadding(8,8,8,8)
 
+    local mdlPanel = window:Add("DPanel")
+    mdlPanel:SetSize(wMin *0.535,0)
+    mdlPanel:Dock(LEFT)
+    mdlPanel:DockPadding(8,8,8,8)
+
+    local mdl = mdlPanel:Add("DAdjustableModelPanel")
+    mdl:Dock(FILL)
+	mdl:SetAmbientLight(Color(255 *0.3,255 *0.3,255 *0.3))
+	mdl:SetDirectionalLight(BOX_FRONT,Color(255 *1.3,255 *1.3,255 *1.3))
+	mdl:SetDirectionalLight(BOX_BACK,Color(255 *0.2,255 *0.2,255 *0.2))
+	mdl:SetDirectionalLight(BOX_RIGHT,Color(255 *0.2,255 *0.2,255 *0.2))
+	mdl:SetDirectionalLight(BOX_LEFT,Color(255 *0.2,255 *0.2,255 *0.2))
+	mdl:SetDirectionalLight(BOX_TOP,Color(255 *2.3,255 *2.3,255 *2.3))
+	mdl:SetDirectionalLight(BOX_BOTTOM,Color(255 *0.1,255 *0.1,255 *0.1))
+    mdl.FarZ = 32768
+
+    -- mdlPanel:Hide()
+
     function modelListPnl:PaintOver()
         controlMusic(ply,0)
+    
+        if ply.SFMenu_LastMenuID != 0 then
+            if ply.SFMenu_LastMenuID == 3 && CurTime() > ply.SFMenu_Katt then
+                local snd = VJ_PICK({
+                    "cpthazama/starfox/vo/katt/ah_hey.wav",
+                    "cpthazama/starfox/vo/katt/cya_foxy.wav",
+                    "cpthazama/starfox/vo/katt/later_foxy.wav",
+                    "cpthazama/starfox/vo/katt/manners_cost_nothing.wav",
+                    "cpthazama/starfox/vo/katt/my_place.wav",
+                    "cpthazama/starfox/vo/katt/part_ways.wav",
+                    "cpthazama/starfox/vo/katt/time_to_exit.wav",
+                })
+                surface.PlaySound(snd)
+                ply.SFMenu_Katt = CurTime() +SoundDuration(snd)
+                ply.SFMenu_KattRand = CurTime() +SoundDuration(snd) +math.Rand(15,30)
+            end
+            ply.SFMenu_LastMenuID = 0
+        end
     end
 
     local PanelSelect = modelListPnl:Add("DPanelSelect")
@@ -386,6 +506,24 @@ net.Receive("SF_Menu",function(len,ply)
 
     function menuGood:PaintOver()
         controlMusic(ply,1)
+    
+        if ply.SFMenu_LastMenuID != 1 then
+            if ply.SFMenu_LastMenuID == 3 && CurTime() > ply.SFMenu_Katt then
+                local snd = VJ_PICK({
+                    "cpthazama/starfox/vo/katt/ah_hey.wav",
+                    "cpthazama/starfox/vo/katt/cya_foxy.wav",
+                    "cpthazama/starfox/vo/katt/later_foxy.wav",
+                    "cpthazama/starfox/vo/katt/manners_cost_nothing.wav",
+                    "cpthazama/starfox/vo/katt/my_place.wav",
+                    "cpthazama/starfox/vo/katt/part_ways.wav",
+                    "cpthazama/starfox/vo/katt/time_to_exit.wav",
+                })
+                surface.PlaySound(snd)
+                ply.SFMenu_Katt = CurTime() +SoundDuration(snd)
+                ply.SFMenu_KattRand = CurTime() +SoundDuration(snd) +math.Rand(15,30)
+            end
+            ply.SFMenu_LastMenuID = 1
+        end
     end
 
     local missionsGood = vgui.Create("DListView")
@@ -413,6 +551,24 @@ net.Receive("SF_Menu",function(len,ply)
 
     function menuBad:PaintOver()
         controlMusic(ply,2)
+    
+        if ply.SFMenu_LastMenuID != 2 then
+            if ply.SFMenu_LastMenuID == 3 && CurTime() > ply.SFMenu_Katt then
+                local snd = VJ_PICK({
+                    "cpthazama/starfox/vo/katt/ah_hey.wav",
+                    "cpthazama/starfox/vo/katt/cya_foxy.wav",
+                    "cpthazama/starfox/vo/katt/later_foxy.wav",
+                    "cpthazama/starfox/vo/katt/manners_cost_nothing.wav",
+                    "cpthazama/starfox/vo/katt/my_place.wav",
+                    "cpthazama/starfox/vo/katt/part_ways.wav",
+                    "cpthazama/starfox/vo/katt/time_to_exit.wav",
+                })
+                surface.PlaySound(snd)
+                ply.SFMenu_Katt = CurTime() +SoundDuration(snd)
+                ply.SFMenu_KattRand = CurTime() +SoundDuration(snd) +math.Rand(15,30)
+            end
+            ply.SFMenu_LastMenuID = 2
+        end
     end
 
     local missionsBad = vgui.Create("DListView")
@@ -432,6 +588,96 @@ net.Receive("SF_Menu",function(len,ply)
     end
     
     local miscTab = sheet:AddSheet("Star Wolf Missions",menuBad,"icons/starfox/logo_wolf16.png")
+    
+        -- Menu Gacha --
+
+    local menuGacha = window:Add("DPanel")
+    menuGacha:SetSize(wMin,wMax)
+    menuGacha:Dock(FILL)
+    menuGacha:DockPadding(8,8,8,8)
+
+    local function AddText(id,text,font)
+        if menuGacha.TextData[id] then
+            menuGacha.TextData[id]:SetText(text)
+        else
+            menuGacha.TextData[id] = vgui.Create("DLabel",menuGacha)
+            menuGacha.TextData[id]:Dock(TOP)
+            menuGacha.TextData[id]:SetText(text)
+            if font then
+                menuGacha.TextData[id]:SetFont("StarFox_Default")
+            end
+        end
+    end
+
+    function menuGacha:PaintOver()
+        controlMusic(ply,3)
+    
+        if ply.SFMenu_LastMenuID != 3 then
+            if CurTime() > ply.SFMenu_Katt then
+                local snd = VJ_PICK({
+                    "cpthazama/starfox/vo/katt/hey.wav",
+                    "cpthazama/starfox/vo/katt/music_to_ears.wav",
+                    "cpthazama/starfox/vo/katt/well_hello_there.wav",
+                    "cpthazama/starfox/vo/katt/help.wav"
+                })
+                surface.PlaySound(snd)
+                ply.SFMenu_Katt = CurTime() +SoundDuration(snd)
+                ply.SFMenu_KattRand = CurTime() +SoundDuration(snd) +math.Rand(15,30)
+            end
+            ply.SFMenu_LastMenuID = 3
+        end
+
+        if CurTime() > ply.SFMenu_KattRand && CurTime() > ply.SFMenu_Katt && math.random(1,20) == 1 then
+            local snd = VJ_PICK({
+                "cpthazama/starfox/vo/katt/checking_in.wav",
+                "cpthazama/starfox/vo/katt/entertain_lady.wav",
+                "cpthazama/starfox/vo/katt/hog_all_the_fun.wav",
+                "cpthazama/starfox/vo/katt/little_farther.wav",
+                "cpthazama/starfox/vo/katt/hey.wav",
+            })
+            surface.PlaySound(snd)
+            ply.SFMenu_KattRand = CurTime() +SoundDuration(snd) +math.Rand(15,30)
+            ply.SFMenu_Katt = CurTime() +SoundDuration(snd)
+        end
+        AddText("Results1","Your Last Gamble Results",true)
+        AddText("Results2",ply:GetNW2String("SFMenu_LastGachaMessage") or " ")
+    end
+	local rates = {}
+	rates.Pilots = 3 *SF_GACHA_RATE_PILOTS
+	rates.ShipParts = 30 *SF_GACHA_RATE_PARTS
+
+    menuGacha.TextData = menuGacha.TextData or {}
+
+    -- AddText("Intro","Take A Gamble at Katt's Lylat Shop!")
+    -- AddText("Blank1"," ")
+    -- AddText("Info1","Drop Rates:")
+    -- AddText("Info2","67% - Random Player XP")
+    -- AddText("Info3","30% - Random Ship Part(s)")
+    -- AddText("Info4","3% - Random Pilot")
+    -- AddText("Results1"," ")
+
+    local img_bg = vgui.Create("DImage",menuGacha)
+    img_bg:Dock(FILL)
+    img_bg:SetSize(window:GetSize())
+    img_bg:SetImage("icons/starfox/rewards/menu.png")
+
+    menuGacha.tabButton = vgui.Create("DButton")
+    menuGacha.tabButton:SetText("Take A Gamble (x1) [25 SF Coins]")
+    menuGacha.tabButton:SetSize(100,64)
+    menuGacha.tabButton:SetConsoleCommand("lfs_sf_gacha")
+    menuGacha.tabButton:SetEnabled(true)
+    menuGacha.tabButton:Dock(BOTTOM)
+    menuGacha:Add(menuGacha.tabButton)
+
+    menuGacha.tabButton = vgui.Create("DButton")
+    menuGacha.tabButton:SetText("Take A Gamble (x5) [125 SF Coins]")
+    menuGacha.tabButton:SetSize(100,64)
+    menuGacha.tabButton:SetConsoleCommand("lfs_sf_gacha_b")
+    menuGacha.tabButton:SetEnabled(true)
+    menuGacha.tabButton:Dock(BOTTOM)
+    menuGacha:Add(menuGacha.tabButton)
+    
+    local miscTab = sheet:AddSheet("Katt's Lylat Shop",menuGacha,"icons/starfox/logo_kattgacha16.png")
 end)
 
 if CLIENT then
